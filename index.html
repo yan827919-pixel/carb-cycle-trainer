@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>碳循环训练系统 · Carb Cycle Pro</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00f0ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="碳循环">
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box }
 :root {
@@ -919,6 +923,15 @@ function copyPlanText() {
 }
 
 // 赞助弹窗
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
+
+// 注册 Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 function showSponsor() { document.getElementById('sponsor-modal').classList.add('show') }
 function hideSponsor() { document.getElementById('sponsor-modal').classList.remove('show') }
 document.getElementById('sponsor-modal').addEventListener('click', function(e) {

@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>碳循环打卡 · 训练计时</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00f0ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="碳循环">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0a0e17;--card:rgba(14,22,48,0.85);--cyan:#00f0ff;--cyan-dim:rgba(0,240,255,0.12);--green:#00ff88;--green-dim:rgba(0,255,136,0.12);--orange:#ff6b35;--orange-dim:rgba(255,107,53,0.15);--magenta:#ff00e5;--gold:#ffd700;--text:#e0e8f0;--dim:#7a8aa0;--border:rgba(0,240,255,0.2);--radius:12px;--font:'Segoe UI',system-ui,-apple-system,sans-serif}
@@ -619,6 +623,15 @@ function switchTimerMode(mode){
 }
 
 // ===== 初始化 =====
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
 document.getElementById('log-date').value=new Date().toISOString().slice(0,10);
 restSet(60);
 hiitInit();
