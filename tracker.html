@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>碳循环打卡 · 训练计时</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0e17;--card:rgba(14,22,48,0.85);--cyan:#00f0ff;--cyan-dim:rgba(0,240,255,0.12);--green:#00ff88;--green-dim:rgba(0,255,136,0.12);--orange:#ff6b35;--orange-dim:rgba(255,107,53,0.15);--magenta:#ff00e5;--gold:#ffd700;--text:#e0e8f0;--dim:#7a8aa0;--border:rgba(0,240,255,0.2);--radius:12px;--font:'Segoe UI',system-ui,-apple-system,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.scanline{position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,240,255,0.015) 2px,rgba(0,240,255,0.015) 4px);pointer-events:none;z-index:1}
+.container{position:relative;z-index:2;max-width:800px;margin:0 auto;padding:70px 1rem 2rem}
+nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(10,14,23,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 1rem;display:flex;align-items:center;height:56px;gap:0}
+nav .logo{font-size:1rem;font-weight:700;background:linear-gradient(135deg,var(--cyan),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:1px;white-space:nowrap;margin-right:1rem}
+nav .nav-links{display:flex;gap:0;flex:1}
+nav a{padding:0.5rem 0.7rem;color:var(--dim);text-decoration:none;font-size:0.8rem;transition:color .3s;cursor:pointer;text-align:center;white-space:nowrap;border-radius:6px}
+nav a.active,nav a:hover{color:var(--cyan);background:var(--cyan-dim)}
+.hero{text-align:center;padding:2rem 0 1.5rem;position:relative}
+.hero h1{font-size:clamp(1.4rem,4vw,2rem);font-weight:800;background:linear-gradient(135deg,var(--cyan),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--dim);font-size:0.85rem;margin-top:0.4rem}
+.tab-bar{display:flex;margin-bottom:1.2rem;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:rgba(0,0,0,0.3)}
+.tab-btn{flex:1;padding:0.6rem 0.5rem;border:none;background:transparent;color:var(--dim);font-weight:600;cursor:pointer;transition:all .3s;font-size:0.8rem;font-family:var(--font);border-right:1px solid var(--border)}
+.tab-btn:last-child{border-right:none}
+.tab-btn.active{background:var(--cyan-dim);color:var(--cyan)}
+.tab-btn:hover:not(.active){color:var(--text);background:rgba(0,240,255,0.05)}
+.tab-content{display:none}
+.tab-content.active{display:block;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;margin-bottom:1rem}
+.card-title{font-size:1rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;color:var(--cyan)}
+.form-group{margin-bottom:0.8rem}
+.form-group label{display:block;font-size:0.75rem;color:var(--dim);margin-bottom:0.3rem;letter-spacing:0.5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:0.6rem 0.8rem;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.9rem;transition:all .3s;outline:none;font-family:var(--font)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--cyan);box-shadow:0 0 12px rgba(0,240,255,0.12)}
+.form-group select option{background:#0a0e17;color:#fff}
+.form-group textarea{resize:vertical;min-height:50px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem}
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.6rem 1.4rem;border:none;border-radius:8px;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all .3s;font-family:var(--font)}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),#0099cc);color:#000}
+.btn-primary:hover{box-shadow:0 0 20px rgba(0,240,255,0.3);transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--cyan)}
+.btn-outline:hover{background:var(--cyan-dim);border-color:var(--cyan)}
+.btn-sm{padding:0.4rem 0.8rem;font-size:0.75rem}
+.btn-danger{background:var(--orange-dim);border:1px solid var(--orange);color:var(--orange)}
+.btn-danger:hover{background:rgba(255,107,53,0.25)}
+.text-center{text-align:center}
+.mt-1{margin-top:1rem}
+.mt-05{margin-top:0.5rem}
+.gap-1{display:flex;gap:0.6rem;flex-wrap:wrap}
+
+/* 打卡历史 */
+.log-entry{border:1px solid var(--border);border-radius:8px;padding:0.8rem 1rem;margin-bottom:0.6rem;background:rgba(0,0,0,0.15);position:relative}
+.log-entry .date{font-size:0.75rem;color:var(--dim)}
+.log-entry .weight{font-size:1.1rem;font-weight:700;color:var(--cyan)}
+.log-entry .day-tag{display:inline-block;padding:0.1rem 0.5rem;border-radius:4px;font-size:0.7rem;font-weight:600}
+.tag-high{background:var(--cyan-dim);color:var(--cyan);border:1px solid var(--cyan)}
+.tag-low{background:var(--orange-dim);color:var(--orange);border:1px solid var(--orange)}
+.tag-rest{background:var(--green-dim);color:var(--green);border:1px solid var(--green)}
+.log-entry .detail{font-size:0.8rem;color:var(--dim);margin-top:0.3rem;line-height:1.5}
+.log-entry .del-btn{position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--dim);cursor:pointer;font-size:1rem;padding:0.2rem}
+.log-entry .del-btn:hover{color:var(--orange)}
+
+/* 图表 */
+canvas#weight-chart{width:100%!important;height:220px!important;border-radius:8px;margin-top:0.5rem}
+
+/* 统计 */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:0.6rem}
+.stat-box{text-align:center;padding:0.6rem;background:rgba(0,0,0,0.25);border-radius:8px;border:1px solid var(--border)}
+.stat-box .num{font-size:1.3rem;font-weight:700;color:var(--cyan)}
+.stat-box .lbl{font-size:0.7rem;color:var(--dim);margin-top:0.1rem}
+
+/* ===== 计时器 ===== */
+.timer-display{text-align:center;padding:1.5rem 0 0.5rem}
+.timer-display .time{font-size:4rem;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:4px;background:linear-gradient(135deg,var(--cyan),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.timer-display .phase{font-size:0.85rem;color:var(--dim);margin-top:0.3rem}
+.timer-display .round-info{font-size:0.75rem;color:var(--dim);margin-top:0.2rem}
+
+/* 圆形进度 */
+.progress-ring{position:relative;display:inline-block;margin:0 auto}
+.progress-ring svg{transform:rotate(-90deg)}
+.progress-ring .bg-circle{fill:none;stroke:rgba(0,240,255,0.1);stroke-width:6}
+.progress-ring .fg-circle{fill:none;stroke:var(--cyan);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 0.3s}
+.progress-ring .center-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2.5rem;font-weight:700;color:var(--text);text-align:center}
+
+.timer-controls{display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;margin-top:0.8rem}
+
+.timer-presets{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem;justify-content:center}
+.timer-presets button{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;color:var(--dim);padding:0.5rem 1rem;font-size:0.75rem;cursor:pointer;transition:all .3s;font-family:var(--font);flex:1;min-width:80px;text-align:center}
+.timer-presets button:hover,.timer-presets button.active{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim)}
+
+.hiit-config{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:0.6rem;margin-top:0.8rem}
+.hiit-config .form-group{margin-bottom:0}
+.hiit-config input{text-align:center;font-size:1.1rem;font-weight:700;padding:0.5rem}
+
+.finish-flash{animation:flash .2s ease 5}
+@keyframes flash{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.empty-state{text-align:center;padding:2rem 1rem;color:var(--dim);font-size:0.85rem}
+
+@media(max-width:500px){
+  nav a{font-size:0.7rem;padding:0.4rem 0.5rem}
+  .timer-display .time{font-size:3.2rem}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<div class="scanline"></div>
+
+<nav>
+  <div class="logo">⟁ CARB CYCLE</div>
+  <div class="nav-links">
+    <a class="active" onclick="switchTab('checkin')">📋 打卡</a>
+    <a onclick="switchTab('history')">📊 历史</a>
+    <a onclick="switchTab('timer')">⏱ 计时</a>
+    <a href="index.html" style="color:var(--dim)">📖 计划</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- ===== TAB 1: 打卡 ===== -->
+  <div class="tab-content active" id="tab-checkin">
+    <div class="card">
+      <div class="card-title">📝 今日打卡</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>📅 日期</label>
+          <input type="date" id="log-date">
+        </div>
+        <div class="form-group">
+          <label>⚖️ 体重 (kg)</label>
+          <input type="number" id="log-weight" placeholder="75.0" step="0.1" min="20" max="250">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>🔄 今日类型</label>
+        <select id="log-type">
+          <option value="high">🟢 高碳日（训练日）</option>
+          <option value="low">🔴 低碳日（轻训）</option>
+          <option value="rest" selected>⚫ 休息日</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>🏋️ 训练内容（可选）</label>
+        <textarea id="log-training" placeholder="e.g. 深蹲4×8 卧推4×10 引体3×8" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>🍽️ 饮食备注（可选）</label>
+        <textarea id="log-meals" placeholder="e.g. 早餐燕麦+蛋 午餐米饭+鸡胸" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>⚡ 今日状态</label>
+        <select id="log-energy">
+          <option value="5">🔥🔥🔥🔥🔥 精力充沛</option>
+          <option value="4">🔥🔥🔥🔥 状态不错</option>
+          <option value="3" selected>🔥🔥🔥 一般</option>
+          <option value="2">🔥🔥 有点累</option>
+          <option value="1">🔥 很疲惫</option>
+        </select>
+      </div>
+      <div class="gap-1">
+        <button class="btn btn-primary" onclick="saveLog()">✓ 保存打卡</button>
+        <button class="btn btn-outline" onclick="clearForm()">⟳ 清空</button>
+      </div>
+      <p id="save-feedback" style="color:var(--green);font-size:0.8rem;margin-top:0.5rem;display:none">✓ 已保存！</p>
+    </div>
+
+    <!-- 快速统计 -->
+    <div id="mini-stats"></div>
+  </div>
+
+  <!-- ===== TAB 2: 历史 ===== -->
+  <div class="tab-content" id="tab-history">
+    <div class="card">
+      <div class="card-title" style="justify-content:space-between;margin-bottom:0.5rem">
+        <span>📊 打卡历史</span>
+        <div class="gap-1">
+          <button class="btn btn-sm btn-outline" onclick="exportLogs()">📥 导出</button>
+          <button class="btn btn-sm btn-danger" onclick="clearAllLogs()">🗑️ 清空</button>
+        </div>
+      </div>
+      <div id="history-chart">
+        <canvas id="weight-chart"></canvas>
+      </div>
+      <div id="stats-summary" class="mt-1"></div>
+      <div id="logs-list" class="mt-1"></div>
+    </div>
+  </div>
+
+  <!-- ===== TAB 3: 计时器 ===== -->
+  <div class="tab-content" id="tab-timer">
+    <!-- 模式切换 -->
+    <div class="tab-bar" style="margin-bottom:1rem">
+      <button class="tab-btn active" id="timer-tab-rest-btn" onclick="switchTimerMode('rest')">⏸️ 休息计时</button>
+      <button class="tab-btn" id="timer-tab-hiit-btn" onclick="switchTimerMode('hiit')">💥 HIIT 计时</button>
+    </div>
+
+    <!-- 休息计时 -->
+    <div class="card" id="timer-mode-rest">
+      <div class="card-title" style="justify-content:center">⏱️ 组间休息计时</div>
+      <div class="text-center">
+        <div class="progress-ring">
+          <svg width="200" height="200">
+            <circle class="bg-circle" cx="100" cy="100" r="85"/>
+            <circle class="fg-circle" id="rest-ring" cx="100" cy="100" r="85" stroke-dasharray="534.07" stroke-dashoffset="0"/>
+          </svg>
+          <div class="center-text" id="rest-display">0</div>
+        </div>
+        <p style="color:var(--dim);font-size:0.8rem;margin-top:0.3rem">秒</p>
+      </div>
+      <div class="timer-controls">
+        <button class="btn btn-primary" id="rest-start-btn" onclick="restStart()">▶ 开始</button>
+        <button class="btn btn-outline" onclick="restPause()" id="rest-pause-btn" style="display:none">⏸ 暂停</button>
+        <button class="btn btn-outline" onclick="restReset()">⟳ 重置</button>
+      </div>
+      <div class="timer-presets" id="rest-presets">
+        <button class="active" data-s="30" onclick="restSet(30)">30s</button>
+        <button data-s="45" onclick="restSet(45)">45s</button>
+        <button data-s="60" onclick="restSet(60)">60s</button>
+        <button data-s="90" onclick="restSet(90)">90s</button>
+        <button data-s="120" onclick="restSet(120)">120s</button>
+      </div>
+      <div class="form-group" style="margin-top:0.8rem;max-width:200px;margin-left:auto;margin-right:auto">
+        <label style="text-align:center">自定义秒数</label>
+        <input type="number" id="rest-custom" value="60" min="5" max="600" style="text-align:center;font-size:1.2rem;font-weight:700">
+        <button class="btn btn-sm btn-outline" style="display:block;margin:0.3rem auto 0" onclick="restSet(parseInt(document.getElementById('rest-custom').value)||60)">设置</button>
+      </div>
+    </div>
+
+    <!-- HIIT 计时 -->
+    <div class="card" id="timer-mode-hiit" style="display:none">
+      <div class="card-title" style="justify-content:center">💥 HIIT 循环计时</div>
+      <div class="hiit-config">
+        <div class="form-group">
+          <label>🏋️ 运动 (秒)</label>
+          <input type="number" id="hiit-work" value="30" min="5" max="300">
+        </div>
+        <div class="form-group">
+          <label>🧘 休息 (秒)</label>
+          <input type="number" id="hiit-rest" value="15" min="5" max="300">
+        </div>
+        <div class="form-group">
+          <label>🔄 轮数</label>
+          <input type="number" id="hiit-rounds" value="8" min="1" max="50">
+        </div>
+      </div>
+      <div class="text-center">
+        <div class="progress-ring">
+          <svg width="200" height="200">
+            <circle class="bg-circle" cx="100" cy="100" r="85"/>
+            <circle class="fg-circle" id="hiit-ring" cx="100" cy="100" r="85" stroke-dasharray="534.07" stroke-dashoffset="0"/>
+          </svg>
+          <div class="center-text" id="hiit-display">0</div>
+        </div>
+        <p style="color:var(--dim);font-size:0.8rem;margin-top:0.3rem">
+          运动 <span id="hiit-phase-label" style="color:var(--cyan);font-weight:600">—</span>
+          · 第 <span id="hiit-round-label" style="color:var(--gold);font-weight:600">0</span>/<span id="hiit-round-total">8</span> 轮
+        </p>
+      </div>
+      <div class="timer-controls">
+        <button class="btn btn-primary" id="hiit-start-btn" onclick="hiitStart()">▶ 开始</button>
+        <button class="btn btn-outline" onclick="hiitPause()" id="hiit-pause-btn" style="display:none">⏸ 暂停</button>
+        <button class="btn btn-outline" onclick="hiitReset()">⟳ 重置</button>
+      </div>
+      <div class="timer-presets">
+        <button data-preset="tabata" onclick="hiitPreset('tabata')">Tabata<br><small>20s/10s×8</small></button>
+        <button data-preset="hiit30" onclick="hiitPreset('hiit30')">HIIT 30<br><small>30s/15s×8</small></button>
+        <button data-preset="hiit45" onclick="hiitPreset('hiit45')">HIIT 45<br><small>45s/15s×8</small></button>
+        <button data-preset="hiit60" onclick="hiitPreset('hiit60')">HIIT 60<br><small>60s/30s×6</small></button>
+      </div>
+    </div>
+
+    <!-- 提示 -->
+    <div class="card" style="background:rgba(0,0,0,0.2)">
+      <p style="color:var(--dim);font-size:0.75rem;text-align:center">
+        💡 计时结束后会有振动提醒 · 请保持页面打开或使用后台模式
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 粒子背景 =====
+const c=document.getElementById('bg'),cx=c.getContext('2d');let ps=[],mx=0,my=0;
+function rs(){c.width=window.innerWidth;c.height=window.innerHeight} rs(); window.addEventListener('resize',rs);
+class P{constructor(){this.reset()}reset(){this.x=Math.random()*c.width;this.y=Math.random()*c.height;this.s=Math.random()*1.5+0.5;this.sx=(Math.random()-0.5)*0.3;this.sy=(Math.random()-0.5)*0.3;this.o=Math.random()*0.4+0.2}update(){this.x+=this.sx;this.y+=this.sy;const dx=mx-this.x,dy=my-this.y,d=Math.sqrt(dx*dx+dy*dy);if(d<150){this.x-=dx*0.005;this.y-=dy*0.005}if(this.x<0||this.x>c.width||this.y<0||this.y>c.height)this.reset()}draw(){cx.beginPath();cx.arc(this.x,this.y,this.s,0,Math.PI*2);cx.fillStyle=`rgba(0,240,255,${this.o})`;cx.fill()}}
+for(let i=0;i<80;i++)ps.push(new P());
+function an(){cx.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.update();p.draw()});for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){const dx=ps[i].x-ps[j].x,dy=ps[i].y-ps[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<120){cx.beginPath();cx.moveTo(ps[i].x,ps[i].y);cx.lineTo(ps[j].x,ps[j].y);cx.strokeStyle=`rgba(0,240,255,${0.06*(1-d/120)})`;cx.lineWidth=0.5;cx.stroke()}}requestAnimationFrame(an)}
+an();document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY});
+
+// ===== 标签切换 =====
+function switchTab(t){document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');document.querySelectorAll('nav a').forEach((a,i)=>{const tabs=['checkin','history','timer','plan'];a.classList.toggle('active',tabs[i]===t)});if(t==='history')renderHistory();if(t==='checkin')renderMiniStats()}
+
+// ===== 打卡数据 =====
+function getLogs(){try{return JSON.parse(localStorage.getItem('carbLogs')||'[]')}catch{return[]}}
+function saveLogs(data){localStorage.setItem('carbLogs',JSON.stringify(data))}
+
+function saveLog(){
+  const date=document.getElementById('log-date').value;
+  const weight=parseFloat(document.getElementById('log-weight').value);
+  const type=document.getElementById('log-type').value;
+  const training=document.getElementById('log-training').value.trim();
+  const meals=document.getElementById('log-meals').value.trim();
+  const energy=parseInt(document.getElementById('log-energy').value);
+  if(!date||!weight){document.getElementById('save-feedback').textContent='⚠️ 请填写日期和体重';document.getElementById('save-feedback').style.color='var(--orange)';document.getElementById('save-feedback').style.display='block';setTimeout(()=>document.getElementById('save-feedback').style.display='none',3000);return}
+  const logs=getLogs();
+  // Check if date exists - overwrite
+  const idx=logs.findIndex(l=>l.date===date);
+  const entry={date,weight,type,training,meals,energy,ts:Date.now()};
+  if(idx>=0)logs[idx]=entry;else logs.push(entry);
+  logs.sort((a,b)=>a.date.localeCompare(b.date));
+  saveLogs(logs);
+  document.getElementById('save-feedback').textContent='✓ 已保存！';document.getElementById('save-feedback').style.color='var(--green)';document.getElementById('save-feedback').style.display='block';setTimeout(()=>document.getElementById('save-feedback').style.display='none',2000);
+  clearForm();renderMiniStats();
+  // vibrate
+  try{navigator.vibrate&&navigator.vibrate(30)}catch(e){}
+}
+
+function clearForm(){
+  document.getElementById('log-weight').value='';
+  document.getElementById('log-training').value='';
+  document.getElementById('log-meals').value='';
+  document.getElementById('log-energy').value='3';
+}
+
+function renderMiniStats(){
+  const logs=getLogs();const el=document.getElementById('mini-stats');
+  if(!logs.length){el.innerHTML='';return}
+  const last=logs[logs.length-1];const first=logs[0];
+  const weightDiff=last.weight-first.weight;
+  const highDays=logs.filter(l=>l.type==='high').length;
+  const totalDays=logs.length;
+  el.innerHTML=`<div class="stats-grid">
+    <div class="stat-box"><div class="num">${last.weight.toFixed(1)}</div><div class="lbl">最新体重</div></div>
+    <div class="stat-box"><div class="num" style="color:${weightDiff>0?'var(--orange)':'var(--green)'}">${weightDiff>0?'+':''}${weightDiff.toFixed(1)}</div><div class="lbl">总变化</div></div>
+    <div class="stat-box"><div class="num">${totalDays}</div><div class="lbl">打卡天数</div></div>
+    <div class="stat-box"><div class="num">${highDays}</div><div class="lbl">高碳日</div></div>
+  </div>`;
+}
+
+function renderHistory(){
+  const logs=getLogs();const list=document.getElementById('logs-list');
+  const stats=document.getElementById('stats-summary');
+  if(!logs.length){
+    list.innerHTML='<div class="empty-state">📭 还没有打卡记录，去「打卡」标签开始吧</div>';
+    stats.innerHTML='';
+    drawChart([]);return;
+  }
+  // Stats
+  const avgWeight=logs.reduce((s,l)=>s+l.weight,0)/logs.length;
+  const highDays=logs.filter(l=>l.type==='high').length;
+  const lowDays=logs.filter(l=>l.type==='low').length;
+  const restDays=logs.filter(l=>l.type==='rest').length;
+  const weightChange=logs[logs.length-1].weight-logs[0].weight;
+  stats.innerHTML=`<div class="stats-grid">
+    <div class="stat-box"><div class="num">${logs.length}</div><div class="lbl">总打卡</div></div>
+    <div class="stat-box"><div class="num" style="color:${weightChange>0?'var(--orange)':'var(--green)'}">${weightChange>0?'+':''}${weightChange.toFixed(1)}kg</div><div class="lbl">体重变化</div></div>
+    <div class="stat-box"><div class="num">${avgWeight.toFixed(1)}</div><div class="lbl">平均体重</div></div>
+    <div class="stat-box"><div class="num">${highDays}/${lowDays}/${restDays}</div><div class="lbl">高/低/休</div></div>
+  </div>`;
+  drawChart(logs);
+  // Log entries (reverse chronological)
+  list.innerHTML=[...logs].reverse().map(l=>{
+    const tagClass=l.type==='high'?'tag-high':l.type==='low'?'tag-low':'tag-rest';
+    const tagLabel=l.type==='high'?'高碳':l.type==='low'?'低碳':'休息';
+    const emojis='★★★★★'.slice(0,l.energy)+'☆☆☆☆☆'.slice(l.energy);
+    return `<div class="log-entry">
+      <button class="del-btn" onclick="deleteLog('${l.date}')">✕</button>
+      <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap">
+        <span class="date">${l.date}</span>
+        <span class="weight">${l.weight.toFixed(1)} kg</span>
+        <span class="day-tag ${tagClass}">${tagLabel}</span>
+        <span style="font-size:0.7rem;color:var(--dim)">${emojis}</span>
+      </div>
+      ${l.training?`<div class="detail">🏋️ ${l.training}</div>`:''}
+      ${l.meals?`<div class="detail">🍽️ ${l.meals}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function deleteLog(date){
+  if(!confirm(`删除 ${date} 的记录？`))return;
+  let logs=getLogs().filter(l=>l.date!==date);
+  saveLogs(logs);renderHistory();
+}
+
+function clearAllLogs(){
+  if(!confirm('确定要清空所有打卡记录吗？此操作不可恢复！'))return;
+  saveLogs([]);renderHistory();
+}
+
+function exportLogs(){
+  const logs=getLogs();
+  if(!logs.length){alert('暂无打卡数据');return}
+  let txt='碳循环打卡记录\n'+'='.repeat(40)+'\n\n';
+  logs.forEach(l=>{
+    const tl=l.type==='high'?'高碳日':l.type==='low'?'低碳日':'休息日';
+    txt+=`${l.date} | ${l.weight.toFixed(1)}kg | ${tl} | 精力:${l.energy}/5\n`;
+    if(l.training)txt+=`  训练: ${l.training}\n`;
+    if(l.meals)txt+=`  饮食: ${l.meals}\n`;
+    txt+='\n';
+  });
+  const blob=new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='碳循环打卡记录_'+new Date().toISOString().slice(0,10)+'.txt';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+
+// ===== 图表 =====
+function drawChart(logs){
+  const canvas=document.getElementById('weight-chart');
+  if(!logs||logs.length<2){const ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);return}
+  const rect=canvas.parentElement.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  const w=Math.max(rect.width-2,300),h=220;
+  canvas.style.width=w+'px';canvas.style.height=h+'px';
+  canvas.width=w*dpr;canvas.height=h*dpr;
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  const pad={t:20,r:15,b:30,l:45},ww=w-pad.l-pad.r,hh=h-pad.t-pad.b;
+  ctx.clearRect(0,0,w,h);
+
+  const weights=logs.map(l=>l.weight);
+  const minW=Math.floor(Math.min(...weights)*0.995*10)/10;
+  const maxW=Math.ceil(Math.max(...weights)*1.005*10)/10;
+  const range=maxW-minW||1;
+
+  // Grid lines
+  ctx.strokeStyle='rgba(0,240,255,0.06)';ctx.lineWidth=0.5;
+  for(let i=0;i<5;i++){const y=pad.t+hh*i/4;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+ww,y);ctx.stroke()}
+
+  // Y labels
+  ctx.fillStyle='var(--dim)';ctx.font='11px sans-serif';ctx.textAlign='right';
+  for(let i=0;i<5;i++){
+    const val=maxW-(maxW-minW)*i/4;
+    ctx.fillText(val.toFixed(1),pad.l-5,pad.t+hh*i/4+4);
+  }
+
+  // Points
+  const pts=logs.map((l,i)=>({x:pad.l+ww*i/(logs.length-1),y:pad.t+hh*(1-(l.weight-minW)/range),weight:l.weight,date:l.date,type:l.type}));
+
+  // Line
+  ctx.beginPath();ctx.strokeStyle='var(--cyan)';ctx.lineWidth=2;ctx.lineJoin='round';
+  pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.stroke();
+
+  // Gradient fill
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+hh);
+  grad.addColorStop(0,'rgba(0,240,255,0.15)');grad.addColorStop(1,'rgba(0,240,255,0)');
+  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.lineTo(pts[pts.length-1].x,pad.t+hh);ctx.lineTo(pts[0].x,pad.t+hh);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+
+  // Dots
+  pts.forEach(p=>{
+    ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);
+    ctx.fillStyle=p.type==='high'?'var(--cyan)':p.type==='low'?'var(--orange)':'var(--green)';
+    ctx.fill();ctx.strokeStyle='var(--bg)';ctx.lineWidth=2;ctx.stroke();
+  });
+
+  // X labels (show every few)
+  ctx.textAlign='center';ctx.font='10px sans-serif';ctx.fillStyle='var(--dim)';
+  const step=Math.max(1,Math.floor(pts.length/7));
+  pts.forEach((p,i)=>{if(i%step===0||i===pts.length-1)ctx.fillText(p.date.slice(5),p.x,pad.t+hh+16)});
+}
+
+// ===== 计时器 - 休息 =====
+let restTimer=null,restRemaining=0,restTotal=0,restRunning=false;
+
+function restSet(s){restTotal=s;restRemaining=s;restRunning=false;clearInterval(restTimer);restUpdateDisplay();document.querySelectorAll('#rest-presets button').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.s)===s))}
+
+function restUpdateDisplay(){
+  const el=document.getElementById('rest-display');
+  el.textContent=restRemaining;
+  const circle=document.getElementById('rest-ring');
+  const circ=534.07;
+  const offset=restTotal>0?circ*(1-restRemaining/restTotal):0;
+  circle.setAttribute('stroke-dashoffset',offset);
+}
+
+function restStart(){
+  if(restRemaining<=0){restSet(parseInt(document.getElementById('rest-custom').value)||60)}
+  if(restRunning)return;
+  restRunning=true;
+  document.getElementById('rest-start-btn').style.display='none';
+  document.getElementById('rest-pause-btn').style.display='inline-block';
+  restTimer=setInterval(()=>{
+    restRemaining--;
+    restUpdateDisplay();
+    if(restRemaining<=0){
+      clearInterval(restTimer);restRunning=false;
+      document.getElementById('rest-start-btn').style.display='inline-block';
+      document.getElementById('rest-pause-btn').style.display='none';
+      restRemaining=0;restUpdateDisplay();
+      // Vibrate & flash
+      try{for(let i=0;i<3;i++)setTimeout(()=>navigator.vibrate&&navigator.vibrate(200),i*400)}catch(e){}
+      document.querySelector('.progress-ring').classList.add('finish-flash');
+      setTimeout(()=>document.querySelector('.progress-ring').classList.remove('finish-flash'),1000);
+    }
+  },1000);
+}
+
+function restPause(){
+  if(!restRunning)return;
+  clearInterval(restTimer);restRunning=false;
+  document.getElementById('rest-start-btn').style.display='inline-block';
+  document.getElementById('rest-pause-btn').style.display='none';
+}
+
+function restReset(){clearInterval(restTimer);restRunning=false;restSet(restTotal||60);document.getElementById('rest-start-btn').style.display='inline-block';document.getElementById('rest-pause-btn').style.display='none'}
+
+// ===== 计时器 - HIIT =====
+let hiitTimer=null,hiitRunning=false,hiitPaused=false;
+let hiitState={work:30,rest:15,rounds:8,currentRound:1,phase:'work',remaining:30,total:30};
+
+function hiitPreset(name){
+  const presets={tabata:{work:20,rest:10,rounds:8},hiit30:{work:30,rest:15,rounds:8},hiit45:{work:45,rest:15,rounds:8},hiit60:{work:60,rest:30,rounds:6}};
+  const p=presets[name];if(!p)return;
+  document.getElementById('hiit-work').value=p.work;
+  document.getElementById('hiit-rest').value=p.rest;
+  document.getElementById('hiit-rounds').value=p.rounds;
+  document.querySelectorAll('#timer-mode-hiit .timer-presets button').forEach(b=>b.classList.toggle('active',b.dataset.preset===name));
+}
+
+function hiitInit(){
+  const work=parseInt(document.getElementById('hiit-work').value)||30;
+  const rest=parseInt(document.getElementById('hiit-rest').value)||15;
+  const rounds=parseInt(document.getElementById('hiit-rounds').value)||8;
+  hiitState={work,rest,rounds,currentRound:1,phase:'work',remaining:work,total:work};
+  hiitUpdateDisplay();
+  document.getElementById('hiit-round-total').textContent=rounds;
+}
+
+function hiitUpdateDisplay(){
+  const el=document.getElementById('hiit-display');
+  el.textContent=hiitState.remaining;
+  const circle=document.getElementById('hiit-ring');
+  const circ=534.07;
+  const offset=hiitState.total>0?circ*(1-hiitState.remaining/hiitState.total):0;
+  circle.setAttribute('stroke-dashoffset',offset);
+  document.getElementById('hiit-phase-label').textContent=hiitState.phase==='work'?'💪':'🧘';
+  document.getElementById('hiit-round-label').textContent=hiitState.currentRound;
+  document.getElementById('hiit-round-total').textContent=hiitState.rounds;
+  // Color
+  circle.setAttribute('stroke',hiitState.phase==='work'?'var(--orange)':'var(--cyan)');
+}
+
+function hiitTick(){
+  hiitState.remaining--;
+  hiitUpdateDisplay();
+  if(hiitState.remaining<=0){
+    // Phase switch
+    if(hiitState.phase==='work'){
+      // Work -> Rest
+      hiitState.phase='rest';
+      hiitState.remaining=hiitState.rest;
+      hiitState.total=hiitState.rest;
+      hiitUpdateDisplay();
+      try{navigator.vibrate&&navigator.vibrate(100)}catch(e){}
+    } else {
+      // Rest -> Work, increment round
+      hiitState.currentRound++;
+      if(hiitState.currentRound>hiitState.rounds){
+        // Done!
+        clearInterval(hiitTimer);hiitRunning=false;
+        document.getElementById('hiit-start-btn').style.display='inline-block';
+        document.getElementById('hiit-pause-btn').style.display='none';
+        hiitState.phase='done';
+        document.getElementById('hiit-display').textContent='✓';
+        document.getElementById('hiit-phase-label').textContent='完成！';
+        try{for(let i=0;i<5;i++)setTimeout(()=>navigator.vibrate&&navigator.vibrate(300),i*500)}catch(e){}
+        document.querySelector('#timer-mode-hiit .progress-ring').classList.add('finish-flash');
+        setTimeout(()=>document.querySelector('#timer-mode-hiit .progress-ring').classList.remove('finish-flash'),2500);
+        return;
+      }
+      hiitState.phase='work';
+      hiitState.remaining=hiitState.work;
+      hiitState.total=hiitState.work;
+      hiitUpdateDisplay();
+      try{navigator.vibrate&&navigator.vibrate(100)}catch(e){}
+    }
+  }
+}
+
+function hiitStart(){
+  if(hiitRunning)return;
+  if(hiitState.phase==='done'){hiitReset();return}
+  if(!hiitState.currentRound||hiitState.phase==='done')hiitInit();
+  hiitRunning=true;
+  document.getElementById('hiit-start-btn').style.display='none';
+  document.getElementById('hiit-pause-btn').style.display='inline-block';
+  hiitTimer=setInterval(hiitTick,1000);
+}
+
+function hiitPause(){
+  clearInterval(hiitTimer);hiitRunning=false;
+  document.getElementById('hiit-start-btn').style.display='inline-block';
+  document.getElementById('hiit-pause-btn').style.display='none';
+}
+
+function hiitReset(){
+  clearInterval(hiitTimer);hiitRunning=false;
+  document.getElementById('hiit-start-btn').style.display='inline-block';
+  document.getElementById('hiit-pause-btn').style.display='none';
+  hiitState={work:30,rest:15,rounds:8,currentRound:1,phase:'work',remaining:30,total:30};
+  hiitInit();
+  document.querySelector('#timer-mode-hiit .progress-ring').classList.remove('finish-flash');
+}
+
+function switchTimerMode(mode){
+  document.querySelectorAll('#tab-timer .tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('timer-tab-'+mode+'-btn').classList.add('active');
+  document.getElementById('timer-mode-rest').style.display=mode==='rest'?'block':'none';
+  document.getElementById('timer-mode-hiit').style.display=mode==='hiit'?'block':'none';
+  if(mode==='rest')restReset();
+  if(mode==='hiit')hiitInit();
+}
+
+// ===== 初始化 =====
+document.getElementById('log-date').value=new Date().toISOString().slice(0,10);
+restSet(60);
+hiitInit();
+renderMiniStats();
+</script>
+</body>
+</html>
