@@ -171,6 +171,38 @@ footer { text-align:center; padding:3rem 0 2rem; color:var(--text-dim); font-siz
 code { background:rgba(0,0,0,0.4); padding:0.2rem 0.4rem; border-radius:4px; font-size:0.9em; color:var(--green) }
 .highlight { color:var(--cyan); font-weight:600 }
 .nc { color:var(--magenta) }
+/* Sponsor */
+.sponsor-btn {
+  position:fixed; bottom:30px; right:30px; z-index:999;
+  width:56px; height:56px; border-radius:50%;
+  background:linear-gradient(135deg,#07C160,#06ad56);
+  border:none; color:#fff; font-size:1.5rem;
+  cursor:pointer; box-shadow:0 4px 20px rgba(7,193,96,0.4);
+  transition:all 0.3s; display:flex; align-items:center; justify-content:center;
+}
+.sponsor-btn:hover { transform:scale(1.1); box-shadow:0 6px 28px rgba(7,193,96,0.6) }
+.sponsor-btn .tip {
+  position:absolute; right:64px; white-space:nowrap;
+  background:rgba(0,0,0,0.8); color:#fff; padding:6px 12px;
+  border-radius:6px; font-size:0.8rem; opacity:0;
+  transition:opacity .3s; pointer-events:none;
+}
+.sponsor-btn:hover .tip { opacity:1 }
+.sponsor-modal {
+  display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+  z-index:1000; background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(8px); align-items:center; justify-content:center;
+}
+.sponsor-modal.show { display:flex; animation:fadeIn .3s ease }
+.sponsor-modal .box {
+  background:#fff; border-radius:16px; padding:2rem;
+  text-align:center; max-width:360px; width:90%; position:relative;
+}
+.sponsor-modal .close { position:absolute; top:12px; right:16px; background:none; border:none; font-size:1.5rem; color:#999; cursor:pointer }
+.sponsor-modal .close:hover { color:#333 }
+.sponsor-modal .qr { width:100%; max-width:280px; border-radius:8px; margin:0.5rem auto; display:block }
+.sponsor-modal h3 { color:#333; font-size:1.1rem; margin-top:0.5rem }
+.sponsor-modal p { color:#666; font-size:0.85rem; margin-top:0.3rem }
 @media (max-width:768px) {
   nav { padding:0 1rem; gap:1rem }
   nav .logo { font-size:1rem }
@@ -739,6 +771,30 @@ window.onload = function() { generatePlan(); };
 ['low-days','high-days'].forEach(id => {
   document.getElementById(id).addEventListener('input', updateCycleTotal);
 });
+
+// 赞助弹窗
+function showSponsor() { document.getElementById('sponsor-modal').classList.add('show') }
+function hideSponsor() { document.getElementById('sponsor-modal').classList.remove('show') }
+document.getElementById('sponsor-modal').addEventListener('click', function(e) {
+  if (e.target === this) hideSponsor();
+});
 </script>
+
+<!-- 赞助按钮 -->
+<button class="sponsor-btn" onclick="showSponsor()">
+  ☕<span class="tip">赞助支持开发者</span>
+</button>
+
+<!-- 赞助弹窗 -->
+<div class="sponsor-modal" id="sponsor-modal">
+  <div class="box">
+    <button class="close" onclick="hideSponsor()">✕</button>
+    <h3>☕ 请我喝杯咖啡</h3>
+    <p>觉得碳循环工具对你有帮助？赞助支持一下开发者吧！</p>
+    <img class="qr" src="wechat-pay.jpg" alt="微信赞赏码">
+    <p style="margin-top:0.3rem;font-size:0.75rem;color:#999">微信扫一扫 · 感谢你的支持 💚</p>
+  </div>
+</div>
+
 </body>
 </html>
