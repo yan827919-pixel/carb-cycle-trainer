@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>碳循环训练系统 · Carb Cycle Pro</title>
 <style>
-/* ===== 基础重置 & 变量 ===== */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box }
 :root {
   --bg-dark: #0a0e17;
@@ -36,321 +35,189 @@ body {
   overflow-x: hidden;
   line-height: 1.7;
 }
-
-/* ===== 背景粒子动画 ===== */
-#particles-canvas {
-  position: fixed; top:0; left:0; width:100%; height:100%;
-  z-index:0; pointer-events: none;
-}
-
-/* ===== 扫描线效果 ===== */
+#particles-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none }
 .scanline {
-  position: fixed; top:0; left:0; width:100%; height:100%;
-  background: repeating-linear-gradient(
-    0deg, transparent, transparent 2px,
-    rgba(0,240,255,0.015) 2px, rgba(0,240,255,0.015) 4px
-  );
-  pointer-events: none; z-index:1;
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,240,255,0.015) 2px, rgba(0,240,255,0.015) 4px);
+  pointer-events:none; z-index:1;
 }
-
-/* ===== 导航栏 ===== */
 nav {
-  position: fixed; top:0; width:100%; z-index:100;
-  background: rgba(10,14,23,0.9);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 2rem;
-  display: flex; align-items: center; height: 60px;
-  gap: 2rem;
+  position:fixed; top:0; width:100%; z-index:100;
+  background: rgba(10,14,23,0.9); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  padding:0 2rem; display:flex; align-items:center; height:60px; gap:2rem;
 }
 nav .logo {
-  font-size: 1.3rem; font-weight: 700;
-  background: linear-gradient(135deg, var(--cyan), var(--magenta));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  letter-spacing: 2px; text-transform: uppercase;
+  font-size:1.3rem; font-weight:700;
+  background:linear-gradient(135deg,var(--cyan),var(--magenta));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  letter-spacing:2px; text-transform:uppercase;
 }
-nav a {
-  color: var(--text-dim); text-decoration: none; font-size: 0.9rem;
-  transition: color 0.3s; position: relative; cursor: pointer;
-}
-nav a:hover, nav a.active { color: var(--cyan) }
-nav a::after {
-  content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px;
-  background: var(--cyan); transition: width 0.3s;
-}
+nav a { color:var(--text-dim); text-decoration:none; font-size:0.9rem; transition:color .3s; position:relative; cursor:pointer }
+nav a:hover, nav a.active { color:var(--cyan) }
+nav a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:2px; background:var(--cyan); transition:width .3s }
 nav a:hover::after, nav a.active::after { width:100% }
-
-/* ===== 主容器 ===== */
-.container {
-  position: relative; z-index:2;
-  max-width: 1200px; margin: 0 auto; padding: 80px 1.5rem 3rem;
-}
-
-/* ===== Hero ===== */
-.hero {
-  text-align: center; padding: 4rem 0 3rem;
-  position: relative;
-}
-.hero::before {
-  content:''; position:absolute; top:50%; left:50%;
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, rgba(0,240,255,0.04), transparent 70%);
-  transform: translate(-50%, -50%); pointer-events: none;
-}
-.hero h1 {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--cyan) 0%, var(--magenta) 50%, var(--gold) 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  letter-spacing: 3px;
-}
-.hero .subtitle {
-  color: var(--text-dim); font-size: 1.1rem; margin-top: 1rem;
-  max-width: 600px; margin-inline: auto;
-}
-.hero .version-badge {
-  display: inline-block; margin-top: 1rem;
-  border: 1px solid var(--cyan); color: var(--cyan);
-  padding: 0.2rem 0.8rem; border-radius: 20px;
-  font-size: 0.75rem; letter-spacing: 1px;
-  background: var(--cyan-dim);
-}
-
-/* ===== 卡片通用 ===== */
+.container { position:relative; z-index:2; max-width:1200px; margin:0 auto; padding:80px 1.5rem 3rem }
+.hero { text-align:center; padding:4rem 0 3rem; position:relative }
+.hero::before { content:''; position:absolute; top:50%; left:50%; width:600px; height:600px; background:radial-gradient(circle,rgba(0,240,255,0.04),transparent 70%); transform:translate(-50%,-50%); pointer-events:none }
+.hero h1 { font-size:clamp(2rem,5vw,3.5rem); font-weight:800; background:linear-gradient(135deg,var(--cyan) 0%,var(--magenta) 50%,var(--gold) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:3px }
+.hero .subtitle { color:var(--text-dim); font-size:1.1rem; margin-top:1rem; max-width:600px; margin-inline:auto }
+.hero .version-badge { display:inline-block; margin-top:1rem; border:1px solid var(--cyan); color:var(--cyan); padding:0.2rem 0.8rem; border-radius:20px; font-size:0.75rem; letter-spacing:1px; background:var(--cyan-dim) }
 .card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 2rem;
-  margin-bottom: 2rem;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s;
+  background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:2rem; margin-bottom:2rem; backdrop-filter:blur(10px); transition:all .3s
 }
-.card:hover { border-color: rgba(0,240,255,0.4); box-shadow: var(--shadow-cyan); }
-.card-title {
-  font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem;
-  display: flex; align-items: center; gap: 0.6rem;
-}
-.card-title .icon { color: var(--cyan); font-size: 1.4rem; }
-.card-title .accent { color: var(--cyan); }
-
-/* ===== 计算器表单 ===== */
-.calc-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.2rem;
-}
-.form-group { position: relative; }
-.form-group label {
-  display: block; font-size: 0.8rem; color: var(--text-dim);
-  margin-bottom: 0.4rem; letter-spacing: 1px;
-}
+.card:hover { border-color:rgba(0,240,255,0.4); box-shadow:var(--shadow-cyan) }
+.card-title { font-size:1.2rem; font-weight:700; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.6rem }
+.card-title .icon { color:var(--cyan); font-size:1.4rem }
+.card-title .accent { color:var(--cyan) }
+.calc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1.2rem }
+.form-group { position:relative }
+.form-group label { display:block; font-size:0.8rem; color:var(--text-dim); margin-bottom:0.4rem; letter-spacing:1px }
 .form-group input, .form-group select {
-  width: 100%; padding: 0.75rem 1rem;
-  background: rgba(0,0,0,0.3);
-  border: 1px solid var(--border); border-radius: 8px;
-  color: var(--text); font-size: 1rem;
-  transition: all 0.3s; outline: none;
-  font-family: var(--font);
+  width:100%; padding:0.75rem 1rem; background:rgba(0,0,0,0.3);
+  border:1px solid var(--border); border-radius:8px; color:var(--text);
+  font-size:1rem; transition:all .3s; outline:none; font-family:var(--font)
 }
-.form-group input:focus, .form-group select:focus {
-  border-color: var(--cyan); box-shadow: 0 0 15px rgba(0,240,255,0.15);
-}
-.form-group select option { background: #0a0e17; color: var(--text); }
-
-/* ===== 按钮 ===== */
+.form-group input:focus, .form-group select:focus { border-color:var(--cyan); box-shadow:0 0 15px rgba(0,240,255,0.15) }
+.form-group select option { background:#0a0e17; color:var(--text) }
 .btn {
-  display: inline-flex; align-items: center; gap: 0.5rem;
-  padding: 0.85rem 2rem;
-  border: none; border-radius: 8px;
-  font-weight: 600; font-size: 1rem;
-  cursor: pointer; transition: all 0.3s;
-  font-family: var(--font);
-  background: linear-gradient(135deg, var(--cyan), #0099cc);
-  color: #000; text-transform: uppercase; letter-spacing: 1px;
+  display:inline-flex; align-items:center; gap:0.5rem; padding:0.85rem 2rem;
+  border:none; border-radius:8px; font-weight:600; font-size:1rem; cursor:pointer;
+  transition:all .3s; font-family:var(--font);
+  background:linear-gradient(135deg,var(--cyan),#0099cc); color:#000;
+  text-transform:uppercase; letter-spacing:1px
 }
-.btn:hover { transform: translateY(-2px); box-shadow: var(--glow-cyan); }
-.btn:active { transform: translateY(0); }
-.btn-outline {
-  background: transparent; border: 1px solid var(--cyan);
-  color: var(--cyan);
-}
-.btn-outline:hover { background: var(--cyan-dim); color: var(--cyan); }
-
-/* ===== 计划输出 ===== */
-#plan-output { display: none; }
-#plan-output.show { display: block; animation: fadeIn 0.5s ease; }
-
+.btn:hover { transform:translateY(-2px); box-shadow:var(--glow-cyan) }
+.btn:active { transform:translateY(0) }
+.btn-outline { background:transparent; border:1px solid var(--cyan); color:var(--cyan) }
+.btn-outline:hover { background:var(--cyan-dim); color:var(--cyan) }
+#plan-output { display:none }
+#plan-output.show { display:block; animation:fadeIn .5s ease }
 @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+.plan-header { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1rem; margin-bottom:2rem }
+.plan-stat { text-align:center; padding:1rem; background:rgba(0,0,0,0.3); border-radius:8px; border:1px solid var(--border) }
+.plan-stat .value { font-size:1.6rem; font-weight:700; color:var(--cyan) }
+.plan-stat .label { font-size:0.75rem; color:var(--text-dim); margin-top:0.2rem }
+.day-card { border:1px solid var(--border); border-radius:10px; padding:1.2rem 1.5rem; margin-bottom:1rem; background:rgba(0,0,0,0.2); transition:all .3s }
+.day-card:hover { border-color:var(--cyan); background:rgba(0,240,255,0.03) }
+.day-card .day-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem }
+.day-card .day-type { padding:0.2rem 0.8rem; border-radius:20px; font-size:0.75rem; font-weight:600; letter-spacing:1px }
+.day-card .day-name { font-weight:700; font-size:1rem }
+.day-high .day-type { background:rgba(0,240,255,0.2); color:var(--cyan); border:1px solid var(--cyan) }
+.day-mid .day-type { background:rgba(255,215,0,0.15); color:var(--gold); border:1px solid var(--gold) }
+.day-low .day-type { background:rgba(255,107,53,0.15); color:var(--orange); border:1px solid var(--orange) }
+.day-zero .day-type { background:rgba(255,0,229,0.12); color:var(--magenta); border:1px solid var(--magenta) }
+.day-rest .day-type { background:rgba(0,255,136,0.12); color:var(--green); border:1px solid var(--green) }
+.day-card .day-detail { font-size:0.9rem; color:var(--text-dim); line-height:1.6 }
+.day-card .day-detail strong { color:var(--text) }
+.card-dark { background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:1rem; margin-top:1rem }
 
-.plan-header {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem; margin-bottom: 2rem;
+/* 自定义循环滑块 */
+.slider-row { display:flex; gap:2rem; align-items:center; flex-wrap:wrap }
+.slider-group { flex:1; min-width:160px }
+.slider-group label { font-size:0.8rem; color:var(--text-dim); display:block; margin-bottom:0.3rem }
+.slider-group input[type=range] {
+  width:100%; -webkit-appearance:none; appearance:none;
+  height:6px; border-radius:3px; background:var(--border);
+  outline:none;
 }
-.plan-stat {
-  text-align: center; padding: 1rem;
-  background: rgba(0,0,0,0.3); border-radius: 8px;
-  border: 1px solid var(--border);
+.slider-group input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:20px; height:20px;
+  border-radius:50%; background:var(--cyan);
+  cursor:pointer; border:2px solid var(--bg-dark);
+  box-shadow:0 0 8px rgba(0,240,255,0.5);
 }
-.plan-stat .value { font-size: 1.6rem; font-weight: 700; color: var(--cyan); }
-.plan-stat .label { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.2rem; }
+.slider-value { color:var(--cyan); font-weight:700; font-size:1.2rem; text-align:center; margin-top:0.2rem }
 
-.day-card {
-  border: 1px solid var(--border); border-radius: 10px;
-  padding: 1.2rem 1.5rem; margin-bottom: 1rem;
-  background: rgba(0,0,0,0.2);
-  transition: all 0.3s;
-}
-.day-card:hover { border-color: var(--cyan); background: rgba(0,240,255,0.03); }
-.day-card .day-head {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 0.8rem;
-}
-.day-card .day-type {
-  padding: 0.2rem 0.8rem; border-radius: 20px;
-  font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
-}
-.day-card .day-name { font-weight: 700; font-size: 1rem; }
-.day-high .day-type { background: rgba(0,240,255,0.2); color: var(--cyan); border: 1px solid var(--cyan); }
-.day-mid .day-type { background: rgba(255,215,0,0.15); color: var(--gold); border: 1px solid var(--gold); }
-.day-low .day-type { background: rgba(255,107,53,0.15); color: var(--orange); border: 1px solid var(--orange); }
-.day-zero .day-type { background: rgba(255,0,229,0.12); color: var(--magenta); border: 1px solid var(--magenta); }
-.day-rest .day-type { background: rgba(0,255,136,0.12); color: var(--green); border: 1px solid var(--green); }
+/* 新手入门 */
+.basics-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.2rem; margin-bottom:1.5rem }
+.basics-card { background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:10px; padding:1.2rem 1.5rem; transition:all .3s }
+.basics-card:hover { border-color:var(--cyan) }
+.basics-card h3 { color:var(--cyan); font-size:1rem; margin-bottom:0.6rem; display:flex; align-items:center; gap:0.5rem }
+.basics-card p, .basics-card li { color:var(--text-dim); font-size:0.9rem; line-height:1.7 }
+.basics-card ul { list-style:none; padding-left:0 }
+.basics-card ul li::before { content:'› '; color:var(--cyan) }
+.basics-card li { margin-bottom:0.3rem }
+.food-table { width:100%; border-collapse:collapse; margin:0.8rem 0; font-size:0.85rem }
+.food-table th,.food-table td { padding:0.5rem 0.8rem; border:1px solid var(--border); text-align:left }
+.food-table th { background:rgba(0,240,255,0.08); color:var(--cyan); font-weight:600 }
+.food-table td { color:var(--text-dim) }
 
-.day-card .day-detail { font-size: 0.9rem; color: var(--text-dim); line-height: 1.6; }
-.day-card .day-detail strong { color: var(--text); }
-.day-card .day-detail ul { list-style: none; padding-left: 0; margin-top: 0.4rem; }
-.day-card .day-detail ul li::before { content: '› '; color: var(--cyan); }
-
-/* ===== 文档区域 ===== */
-.doc-section { margin-bottom: 2.5rem; }
-.doc-section h2 {
-  font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-  color: var(--cyan);
-}
-.doc-section h3 {
-  font-size: 1.05rem; color: var(--gold); margin: 1.2rem 0 0.6rem;
-}
-.doc-section p { color: var(--text-dim); margin-bottom: 0.8rem; }
-.doc-section ul, .doc-section ol { color: var(--text-dim); padding-left: 1.5rem; margin-bottom: 1rem; }
-.doc-section li { margin-bottom: 0.4rem; }
-.doc-section strong { color: var(--text); }
-.doc-section table {
-  width: 100%; border-collapse: collapse; margin: 1rem 0;
-  font-size: 0.9rem;
-}
-.doc-section th, .doc-section td {
-  padding: 0.6rem 1rem; border: 1px solid var(--border);
-  text-align: left;
-}
-.doc-section th { background: rgba(0,240,255,0.08); color: var(--cyan); font-weight: 600; }
-.doc-section td { color: var(--text-dim); }
-.doc-section .tag {
-  display: inline-block; padding: 0.1rem 0.5rem; border-radius: 4px;
-  font-size: 0.75rem; margin-right: 0.3rem;
-}
-.tag-cyan { background: var(--cyan-dim); color: var(--cyan); }
-.tag-magenta { background: var(--magenta-dim); color: var(--magenta); }
-.tag-green { background: var(--green-dim); color: var(--green); }
-.tag-orange { background: rgba(255,107,53,0.15); color: var(--orange); }
-
-/* ===== 标签切换 ===== */
-.tab-bar {
-  display: flex; gap: 0; margin-bottom: 2rem;
-  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
-  background: rgba(0,0,0,0.3);
-}
-.tab-btn {
-  flex: 1; padding: 0.8rem 1rem; border: none;
-  background: transparent; color: var(--text-dim);
-  font-weight: 600; cursor: pointer; transition: all 0.3s;
-  font-size: 0.9rem; font-family: var(--font);
-  border-right: 1px solid var(--border);
-}
-.tab-btn:last-child { border-right: none; }
-.tab-btn.active { background: var(--cyan-dim); color: var(--cyan); }
-.tab-btn:hover:not(.active) { color: var(--text); background: rgba(0,240,255,0.05); }
-
-.tab-content { display: none; }
-.tab-content.active { display: block; animation: fadeIn 0.4s ease; }
-
-/* ===== Footer ===== */
-footer {
-  text-align: center; padding: 3rem 0 2rem;
-  color: var(--text-dim); font-size: 0.8rem;
-  border-top: 1px solid var(--border); margin-top: 3rem;
-}
-
-/* ===== 代码高亮 ===== */
-code { background: rgba(0,0,0,0.4); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.9em; color: var(--green); }
-
-/* ===== 响应式 ===== */
-@media (max-width: 768px) {
-  nav { padding: 0 1rem; gap: 1rem; }
-  nav .logo { font-size: 1rem; }
-  .container { padding-top: 70px; }
-  .card { padding: 1.2rem; }
-  .calc-grid { grid-template-columns: 1fr; }
-  .plan-header { grid-template-columns: repeat(2, 1fr); }
+.doc-section { margin-bottom:2.5rem }
+.doc-section h2 { font-size:1.3rem; font-weight:700; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border); color:var(--cyan) }
+.doc-section h3 { font-size:1.05rem; color:var(--gold); margin:1.2rem 0 0.6rem }
+.doc-section p { color:var(--text-dim); margin-bottom:0.8rem }
+.doc-section ul,.doc-section ol { color:var(--text-dim); padding-left:1.5rem; margin-bottom:1rem }
+.doc-section li { margin-bottom:0.4rem }
+.doc-section strong { color:var(--text) }
+.doc-section table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.9rem }
+.doc-section th,.doc-section td { padding:0.6rem 1rem; border:1px solid var(--border); text-align:left }
+.doc-section th { background:rgba(0,240,255,0.08); color:var(--cyan); font-weight:600 }
+.doc-section td { color:var(--text-dim) }
+.tag { display:inline-block; padding:0.1rem 0.5rem; border-radius:4px; font-size:0.75rem; margin-right:0.3rem }
+.tag-cyan { background:var(--cyan-dim); color:var(--cyan) }
+.tag-magenta { background:var(--magenta-dim); color:var(--magenta) }
+.tag-green { background:var(--green-dim); color:var(--green) }
+.tag-orange { background:rgba(255,107,53,0.15); color:var(--orange) }
+.tab-bar { display:flex; gap:0; margin-bottom:2rem; border:1px solid var(--border); border-radius:10px; overflow:hidden; background:rgba(0,0,0,0.3) }
+.tab-btn { flex:1; padding:0.8rem 1rem; border:none; background:transparent; color:var(--text-dim); font-weight:600; cursor:pointer; transition:all .3s; font-size:0.9rem; font-family:var(--font); border-right:1px solid var(--border) }
+.tab-btn:last-child { border-right:none }
+.tab-btn.active { background:var(--cyan-dim); color:var(--cyan) }
+.tab-btn:hover:not(.active) { color:var(--text); background:rgba(0,240,255,0.05) }
+.tab-content { display:none }
+.tab-content.active { display:block; animation:fadeIn .4s ease }
+footer { text-align:center; padding:3rem 0 2rem; color:var(--text-dim); font-size:0.8rem; border-top:1px solid var(--border); margin-top:3rem }
+code { background:rgba(0,0,0,0.4); padding:0.2rem 0.4rem; border-radius:4px; font-size:0.9em; color:var(--green) }
+.highlight { color:var(--cyan); font-weight:600 }
+.nc { color:var(--magenta) }
+@media (max-width:768px) {
+  nav { padding:0 1rem; gap:1rem }
+  nav .logo { font-size:1rem }
+  .container { padding-top:70px }
+  .card { padding:1.2rem }
+  .calc-grid { grid-template-columns:1fr }
+  .plan-header { grid-template-columns:repeat(2,1fr) }
+  .slider-row { flex-direction:column; gap:1rem }
+  .basics-grid { grid-template-columns:1fr }
 }
 </style>
 </head>
 <body>
-
-<!-- 粒子背景 -->
 <canvas id="particles-canvas"></canvas>
 <div class="scanline"></div>
-
-<!-- 导航 -->
 <nav>
   <div class="logo">⟁ CARB CYCLE</div>
   <a class="active" onclick="switchTab('calculator')">训练计划</a>
+  <a onclick="switchTab('basics')">新手入门</a>
   <a onclick="switchTab('guide')">方法指南</a>
 </nav>
-
 <div class="container">
-
-  <!-- Hero -->
   <div class="hero">
     <h1>⚡ 碳循环训练系统</h1>
-    <p class="subtitle">Carb Cycling Pro — 基于科学计算，为你自动生成个性化碳循环训练方案</p>
-    <span class="version-badge">v2.0 · AI 驱动</span>
+    <p class="subtitle">Carb Cycling Pro — 小白也能自己安排碳循环训练，手把手带你入门</p>
+    <span class="version-badge">v3.0 · 新手友好</span>
   </div>
 
-  <!-- 标签 -->
   <div class="tab-bar">
-    <button class="tab-btn active" id="tab-calculator-btn" onclick="switchTab('calculator')">📊 智能生成计划</button>
+    <button class="tab-btn active" id="tab-calculator-btn" onclick="switchTab('calculator')">📊 生成计划</button>
+    <button class="tab-btn" id="tab-basics-btn" onclick="switchTab('basics')">🌱 新手入门</button>
     <button class="tab-btn" id="tab-guide-btn" onclick="switchTab('guide')">📖 方法指南</button>
   </div>
 
   <!-- ====== TAB 1: 计算器 ====== -->
   <div class="tab-content active" id="tab-calculator">
-
     <div class="card">
       <div class="card-title">
         <span class="icon">📐</span>
-        <span class="accent">输入身体参数</span>
+        <span class="accent">输入你的身体参数</span>
         <span style="color:var(--text-dim);font-size:0.8rem;font-weight:400;margin-left:auto">生成专属训练计划</span>
       </div>
       <div class="calc-grid">
-        <div class="form-group">
-          <label>👤 性别</label>
-          <select id="gender"><option value="male">男性</option><option value="female">女性</option></select>
-        </div>
-        <div class="form-group">
-          <label>📏 身高 (cm)</label>
-          <input type="number" id="height" placeholder="e.g. 175" min="120" max="230" value="175">
-        </div>
-        <div class="form-group">
-          <label>⚖️ 体重 (kg)</label>
-          <input type="number" id="weight" placeholder="e.g. 75" min="30" max="200" value="75">
-        </div>
-        <div class="form-group">
-          <label>🎂 年龄</label>
-          <input type="number" id="age" placeholder="e.g. 25" min="14" max="80" value="28">
-        </div>
+        <div class="form-group"><label>👤 性别</label><select id="gender"><option value="male">男性</option><option value="female">女性</option></select></div>
+        <div class="form-group"><label>📏 身高 (cm)</label><input type="number" id="height" placeholder="175" min="120" max="230" value="175"></div>
+        <div class="form-group"><label>⚖️ 体重 (kg)</label><input type="number" id="weight" placeholder="75" min="30" max="200" value="75"></div>
+        <div class="form-group"><label>🎂 年龄</label><input type="number" id="age" placeholder="28" min="14" max="80" value="28"></div>
         <div class="form-group">
           <label>🏃 活动水平</label>
           <select id="activity">
@@ -368,39 +235,187 @@ code { background: rgba(0,0,0,0.4); padding: 0.2rem 0.4rem; border-radius: 4px; 
             <option value="bulk">💪 增肌</option>
           </select>
         </div>
+      </div>
+
+      <!-- 循环方案选择 -->
+      <div style="margin-top:1.2rem">
         <div class="form-group">
           <label>🔄 循环方案</label>
-          <select id="cycle-scheme">
-            <option value="basic">基础（训练日/休息日）</option>
-            <option value="3plus1" selected>经典（高-中-低-无 4天循环）</option>
+          <select id="cycle-scheme" onchange="onSchemeChange()">
+            <option value="custom" selected>✏️ 自定义（自己设低碳/高碳天数）</option>
+            <option value="basic">基础（训练日高碳 / 休息日低碳）</option>
+            <option value="3plus1">经典（高-中-低-无 4天循环）</option>
             <option value="hlhl">进阶（高-低-低-高 4天循环）</option>
           </select>
         </div>
       </div>
+
+      <!-- 自定义滑块 -->
+      <div id="custom-sliders" class="card-dark">
+        <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:0.8rem">拖动滑块设置你的循环周期：</p>
+        <div class="slider-row">
+          <div class="slider-group">
+            <label>🔴 低碳天数（训练量小/休息）</label>
+            <input type="range" id="low-days" min="1" max="5" value="2" oninput="document.getElementById('low-days-val').textContent=this.value">
+            <div class="slider-value"><span id="low-days-val">2</span> 天</div>
+          </div>
+          <div class="slider-group">
+            <label>🟢 高碳天数（高强度训练日）</label>
+            <input type="range" id="high-days" min="1" max="5" value="2" oninput="document.getElementById('high-days-val').textContent=this.value">
+            <div class="slider-value"><span id="high-days-val">2</span> 天</div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:0.6rem">
+          <p style="color:var(--text-dim);font-size:0.85rem">
+            循环周期：<span class="highlight" id="cycle-total">4</span> 天
+            &nbsp;·&nbsp; 推荐：减脂期 2低+1高 / 增肌期 2高+1低
+          </p>
+        </div>
+      </div>
+
       <div style="margin-top:1.5rem; display:flex; gap:1rem; flex-wrap:wrap">
         <button class="btn" onclick="generatePlan()">✦ 生成训练计划</button>
         <button class="btn btn-outline" onclick="resetForm()">⟳ 重置</button>
       </div>
     </div>
-
-    <!-- 计划输出 -->
     <div id="plan-output"></div>
   </div>
 
-  <!-- ====== TAB 2: 方法指南 ====== -->
+  <!-- ====== TAB 2: 新手入门 ====== -->
+  <div class="tab-content" id="tab-basics">
+    <div class="card">
+      <div class="card-title"><span class="icon">🌱</span><span class="accent">新手入门 · 小白也能懂的碳循环</span></div>
+
+      <!-- 食物碳水速查 -->
+      <div class="doc-section">
+        <h2>🍚 常见食物碳水含量速查表</h2>
+        <p>做碳循环最重要的就是知道吃了多少碳水。下面帮你整理好了最常见食物的数据：</p>
+        <table class="food-table">
+          <tr><th>食物</th><th>分量</th><th>碳水含量</th><th>相当于</th></tr>
+          <tr><td>🍚 白米饭</td><td>1盒外卖（约250g）</td><td><span class="highlight">~65g</span></td><td>高碳日主食×1份</td></tr>
+          <tr><td>🍜 面条/拉面</td><td>1碗（约200g熟重）</td><td><span class="highlight">~48g</span></td><td>中碳日主食×1份</td></tr>
+          <tr><td>🥟 饺子</td><td>10个（猪肉馅）</td><td><span class="highlight">~45g</span></td><td>低碳日慎吃</td></tr>
+          <tr><td>🍞 白面包/吐司</td><td>2片</td><td><span class="highlight">~30g</span></td><td>高碳日加餐</td></tr>
+          <tr><td>🥔 土豆（中等大小）</td><td>1个（约150g）</td><td><span class="highlight">~26g</span></td><td>优质碳水来源</td></tr>
+          <tr><td>🍠 红薯</td><td>1个（约150g）</td><td><span class="highlight">~27g</span></td><td>✅ 低碳日也可少量</td></tr>
+          <tr><td>🌽 玉米</td><td>1根（约200g）</td><td><span class="highlight">~42g</span></td><td>中碳日主食</td></tr>
+          <tr><td>🥣 燕麦片（生）</td><td>50g（约3勺）</td><td><span class="highlight">~34g</span></td><td>高碳日早餐首选</td></tr>
+          <tr><td>🍌 香蕉</td><td>1根中等大小</td><td><span class="highlight">~24g</span></td><td>✅ 训练前后吃</td></tr>
+          <tr><td>🍎 苹果</td><td>1个中等大小</td><td><span class="highlight">~22g</span></td><td>低碳日可以吃</td></tr>
+          <tr><td>🥦 西兰花（100g）</td><td>1碗分量</td><td><span class="highlight">~4g</span></td><td>✅ 随便吃</td></tr>
+          <tr><td>🥬 菠菜/绿叶菜（100g）</td><td>1把</td><td><span class="highlight">~1-3g</span></td><td>✅ 随便吃</td></tr>
+          <tr><td>🥩 鸡胸肉/牛肉/鱼（100g）</td><td>1巴掌大小</td><td><span class="highlight">~0g</span></td><td>✅ 蛋白质随便吃</td></tr>
+          <tr><td>🥚 鸡蛋（1个）</td><td>1个</td><td><span class="highlight">~1g</span></td><td>✅ 放心吃</td></tr>
+          <tr><td>🧀 牛奶（250ml）</td><td>1盒</td><td><span class="highlight">~12g</span></td><td>低碳日注意</td></tr>
+          <tr><td>🥜 花生/坚果（30g）</td><td>1小把</td><td><span class="highlight">~5-8g</span></td><td>✅ 低碳日好脂肪来源</td></tr>
+        </table>
+        <p style="font-size:0.85rem;margin-top:0.5rem">💡 <strong>记住：</strong>蔬菜和肉类的碳水很少，吃肉吃菜基本不用担心碳水超标！碳水主要来自 <span class="highlight">米、面、面包、土豆、水果、糖</span>。</p>
+      </div>
+
+      <!-- 看配料表 -->
+      <div class="doc-section">
+        <h2>🏷️ 怎么看食品配料表？</h2>
+        <p>超市买东西翻过来背面，找到「营养成分表」，重点看这3个地方：</p>
+        <div class="basics-grid">
+          <div class="basics-card">
+            <h3>① 碳水化合物</h3>
+            <p>直接写的是「每100g含碳水 XXg」。这就是你要的数字。</p>
+            <p style="margin-top:0.4rem">📌 如果写了「糖」的含量，<strong style="color:var(--cyan)">糖 = 碳水的一部分</strong>，不是额外加的。</p>
+          </div>
+          <div class="basics-card">
+            <h3>② 每份 vs 每100g</h3>
+            <p>有些商家用「每份」来迷惑人。比如一包薯片写着「每份碳水15g」，你以为不多？但一包可能是 <strong>3份</strong>！</p>
+            <p style="margin-top:0.4rem">📌 <strong style="color:var(--orange)">永远看「每100g」</strong>，然后按你吃的重量换算。</p>
+          </div>
+          <div class="basics-card">
+            <h3>③ 配料表顺序</h3>
+            <p>配料按含量从多到少排列。<span class="highlight">白砂糖、小麦粉、淀粉</span>排在前面的，碳水肯定高。</p>
+            <p style="margin-top:0.4rem">📌 低碳日买东西前翻过来看，<strong style="color:var(--orange)">糖排前三的慎买</strong>。</p>
+          </div>
+        </div>
+        <div class="card-dark" style="margin-top:1rem">
+          <p style="color:var(--text);font-size:0.9rem">🧪 <strong>实战演练：看一瓶可乐</strong></p>
+          <p style="color:var(--text-dim);font-size:0.85rem">
+            营养成分表：每100ml含碳水 10.6g，一瓶500ml → 10.6×5 = <span class="highlight">53g碳水</span> ≈ 一碗米饭的量 😱<br>
+            所以低碳日喝一瓶可乐 = 今天碳水额度的三分之一没了！
+          </p>
+        </div>
+      </div>
+
+      <!-- 新手常见问题 -->
+      <div class="doc-section">
+        <h2>❓ 新手最常问的 5 个问题</h2>
+        <div class="basics-grid">
+          <div class="basics-card">
+            <h3>🤔 我完全不会做饭怎么办？</h3>
+            <p>外卖也能碳循环！高碳日点「米饭+肉+蔬菜」套餐，低碳日点「沙拉+鸡胸肉」或「麻辣烫只吃肉和菜」。记住：<strong style="color:var(--cyan)">米饭吃一半留一半</strong>就是中碳。</p>
+          </div>
+          <div class="basics-card">
+            <h3>🕐 什么时候吃碳水最好？</h3>
+            <p><strong style="color:var(--cyan)">训练前1-2小时</strong>吃碳水给你能量，<strong style="color:var(--cyan)">训练后1小时内</strong>吃碳水帮助恢复。这俩时间点吃碳水利用率最高，不容易变脂肪。</p>
+          </div>
+          <div class="basics-card">
+            <h3>😰 低碳日饿得慌怎么办？</h3>
+            <p>多吃 <span class="highlight">蔬菜</span>！西兰花、菠菜、生菜吃到饱都没问题。也可以喝点 <span class="highlight">黑咖啡、绿茶</span>抑制食欲。实在饿就吃一把坚果或一个鸡蛋。</p>
+          </div>
+          <div class="basics-card">
+            <h3>🏋️ 女生也要做力量训练吗？</h3>
+            <p>对！女生长肌肉非常难（睾酮只有男性的1/10），力量训练只会让你 <strong style="color:var(--cyan)">线条更好看</strong>，不会变壮。高碳日去举铁，低碳日做瑜伽/有氧就行。</p>
+          </div>
+          <div class="basics-card">
+            <h3>💤 睡着了会消耗脂肪吗？</h3>
+            <p>会！低碳日+睡够8小时，生长激素分泌最多，脂肪分解最快。所以 <strong style="color:var(--orange)">不要熬夜</strong>，熬夜=白费碳循环。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 简易操作 -->
+      <div class="doc-section">
+        <h2>📋 小白三步上手</h2>
+        <div class="basics-grid">
+          <div class="basics-card" style="text-align:center">
+            <h3 style="justify-content:center">STEP 1</h3>
+            <p style="font-size:1.5rem;color:var(--cyan);font-weight:700">📐</p>
+            <p>回到「生成计划」标签，<br>填好身高体重年龄，<br>点击生成计划。</p>
+          </div>
+          <div class="basics-card" style="text-align:center">
+            <h3 style="justify-content:center">STEP 2</h3>
+            <p style="font-size:1.5rem;color:var(--cyan);font-weight:700">📱</p>
+            <p>按照生成的每日安排<br>吃饭 + 训练。看这里<br>的<strong>食物速查表</strong>估量。</p>
+          </div>
+          <div class="basics-card" style="text-align:center">
+            <h3 style="justify-content:center">STEP 3</h3>
+            <p style="font-size:1.5rem;color:var(--cyan);font-weight:700">📊</p>
+            <p>每周称一次体重，<br>4周后重新来生成<br>调整新的计划！</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 避坑 -->
+      <div class="card-dark">
+        <p style="color:var(--orange);font-weight:600;margin-bottom:0.5rem">⚠️ 新手避坑指南</p>
+        <ul style="color:var(--text-dim);font-size:0.85rem;list-style:none;padding-left:0">
+          <li style="margin-bottom:0.3rem">❌ <strong>不要</strong> 低碳日完全不吃东西 — 不吃蛋白质会掉肌肉</li>
+          <li style="margin-bottom:0.3rem">❌ <strong>不要</strong> 每天都想高碳 — 那跟普通饮食没区别</li>
+          <li style="margin-bottom:0.3rem">❌ <strong>不要</strong> 过度追求精确 — 吃个米饭没必要上秤，估个大概就行</li>
+          <li style="margin-bottom:0.3rem">✅ <strong>要</strong> 多喝白水/茶，少喝饮料果汁</li>
+          <li style="margin-bottom:0.3rem">✅ <strong>要</strong> 吃饱蔬菜和蛋白质，不要让肚子饿着</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== TAB 3: 方法指南 ====== -->
   <div class="tab-content" id="tab-guide">
     <div class="card">
       <div class="card-title"><span class="icon">📖</span><span class="accent">碳循环锻炼方法 · 完全指南</span></div>
-
       <div class="doc-section">
         <h2>一、什么是碳循环？</h2>
         <p><strong>碳循环（Carb Cycling）</strong>是一种通过<strong>交替高低碳水化合物摄入量</strong>来优化身体成分（减脂增肌）和运动表现的方法。核心思路是：<strong>在不同训练日匹配不同的碳水摄入量</strong>，让身体在需要的时候有能量，在不需要的时候燃烧脂肪。</p>
       </div>
-
       <div class="doc-section">
         <h2>二、基本原理</h2>
-        <table>
-          <tr><th>状态</th><th>摄入</th><th>身体反应</th></tr>
+        <table><tr><th>状态</th><th>摄入</th><th>身体反应</th></tr>
           <tr><td><span class="tag tag-cyan">高碳日</span></td><td>碳水充足</td><td>胰岛素↑ → 合成代谢 → 肌肉生长 + 力量表现</td></tr>
           <tr><td><span class="tag tag-orange">低碳日</span></td><td>碳水限制</td><td>胰岛素↓ → 脂肪分解↑ → 燃烧脂肪供能</td></tr>
           <tr><td><span class="tag tag-magenta">无碳日</span></td><td>几乎无碳水</td><td>糖原耗尽 → 最大化脂肪氧化</td></tr>
@@ -412,25 +427,20 @@ code { background: rgba(0,0,0,0.4); padding: 0.2rem 0.4rem; border-radius: 4px; 
           <li><strong>蛋白质恒定</strong> — 无论高低碳日，蛋白质摄入都要充足</li>
         </ul>
       </div>
-
       <div class="doc-section">
-        <h2>三、三种主流方案</h2>
+        <h2>三、循环方案参考</h2>
         <h3>方案 A：经典 3+1 循环（适合中级以上）</h3>
-        <table>
-          <tr><th>天数</th><th>类型</th><th>碳水摄入</th><th>训练安排</th></tr>
+        <table><tr><th>天数</th><th>类型</th><th>碳水摄入</th><th>训练安排</th></tr>
           <tr><td>Day 1</td><td><span class="tag tag-cyan">高碳日</span></td><td>3-4g/kg</td><td>大肌群重训（腿/背）</td></tr>
           <tr><td>Day 2</td><td><span class="tag tag-cyan" style="background:rgba(255,215,0,0.15);color:var(--gold)">中碳日</span></td><td>2-2.5g/kg</td><td>小肌群或上肢训练</td></tr>
           <tr><td>Day 3</td><td><span class="tag tag-orange">低碳日</span></td><td>1-1.5g/kg</td><td>中等强度训练</td></tr>
           <tr><td>Day 4</td><td><span class="tag tag-magenta">无碳日</span></td><td>&lt;0.5g/kg</td><td>低强度有氧或休息</td></tr>
         </table>
-
         <h3>方案 B：训练日/休息日（适合新手）</h3>
-        <table>
-          <tr><th>类型</th><th>碳水摄入</th><th>安排</th></tr>
+        <table><tr><th>类型</th><th>碳水摄入</th><th>安排</th></tr>
           <tr><td><span class="tag tag-cyan">💪 训练日</span></td><td>2.5-3.5g/kg</td><td>力量/增肌训练</td></tr>
           <tr><td><span class="tag tag-green">😴 休息日</span></td><td>1-1.5g/kg</td><td>休息或轻度有氧</td></tr>
         </table>
-
         <h3>方案 C：高-低-低-高（4天循环，适合减脂瓶颈期）</h3>
         <ul>
           <li>Day 1: 高碳 + 大重量复合训练</li>
@@ -439,7 +449,6 @@ code { background: rgba(0,0,0,0.4); padding: 0.2rem 0.4rem; border-radius: 4px; 
           <li>Day 4: 高碳 + 爆发力训练</li>
         </ul>
       </div>
-
       <div class="doc-section">
         <h2>四、热量与宏量营养素计算</h2>
         <p><strong>基础代谢率（BMR）：</strong></p>
@@ -447,18 +456,8 @@ code { background: rgba(0,0,0,0.4); padding: 0.2rem 0.4rem; border-radius: 4px; 
           <li>男性：BMR = 88.36 + (13.4 × 体重kg) + (4.8 × 身高cm) − (5.7 × 年龄)</li>
           <li>女性：BMR = 447.6 + (9.25 × 体重kg) + (3.1 × 身高cm) − (4.33 × 年龄)</li>
         </ul>
-        <p><strong>TDEE（每日总消耗）：</strong><br>
-        总消耗 = BMR × 活动系数</p>
-        <table>
-          <tr><th>活动水平</th><th>系数</th></tr>
-          <tr><td>久坐</td><td>BMR × 1.2</td></tr>
-          <tr><td>轻度（1-3天/周）</td><td>BMR × 1.375</td></tr>
-          <tr><td>中度（3-5天/周）</td><td>BMR × 1.55</td></tr>
-          <tr><td>高度（6-7天/周）</td><td>BMR × 1.725</td></tr>
-        </table>
         <p><strong>目标热量：</strong> 减脂 TDEE−300~500 | 增肌 TDEE+200~300 | 保持 TDEE</p>
       </div>
-
       <div class="doc-section">
         <h2>五、注意事项</h2>
         <ul>
@@ -472,113 +471,75 @@ code { background: rgba(0,0,0,0.4); padding: 0.2rem 0.4rem; border-radius: 4px; 
         </ul>
       </div>
     </div>
-
-    <footer>
-      <p>Carb Cycle Pro v2.0 · 本工具仅供参考，具体方案请咨询专业教练/营养师</p>
-    </footer>
+    <footer><p>Carb Cycle Pro v3.0 · 本工具仅供参考，具体方案请咨询专业教练/营养师</p></footer>
   </div>
-
 </div>
 
 <script>
-// ========== 粒子背景 ==========
 const canvas = document.getElementById('particles-canvas');
 const ctx = canvas.getContext('2d');
-let particles = [];
-let mouseX = 0, mouseY = 0;
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener('resize', resizeCanvas);
-
+let particles = []; let mouseX = 0, mouseY = 0;
+function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight }
+resizeCanvas(); window.addEventListener('resize', resizeCanvas);
 class Particle {
-  constructor() {
-    this.reset();
-  }
-  reset() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.size = Math.random() * 1.5 + 0.5;
-    this.speedX = (Math.random() - 0.5) * 0.4;
-    this.speedY = (Math.random() - 0.5) * 0.4;
-    this.opacity = Math.random() * 0.5 + 0.2;
-  }
-  update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
-    // Mouse interaction
-    const dx = mouseX - this.x;
-    const dy = mouseY - this.y;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    if (dist < 150) {
-      this.x -= dx * 0.005;
-      this.y -= dy * 0.005;
-    }
-    if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-      this.reset();
-    }
-  }
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(0, 240, 255, ${this.opacity})`;
-    ctx.fill();
-  }
+  constructor() { this.reset() }
+  reset() { this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; this.size = Math.random()*1.5+0.5; this.speedX = (Math.random()-0.5)*0.4; this.speedY = (Math.random()-0.5)*0.4; this.opacity = Math.random()*0.5+0.2 }
+  update() { this.x+=this.speedX; this.y+=this.speedY; const dx=mouseX-this.x, dy=mouseY-this.y, dist=Math.sqrt(dx*dx+dy*dy); if(dist<150){this.x-=dx*0.005; this.y-=dy*0.005} if(this.x<0||this.x>canvas.width||this.y<0||this.y>canvas.height) this.reset() }
+  draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=`rgba(0,240,255,${this.opacity})`; ctx.fill() }
 }
-
-for (let i = 0; i < 120; i++) particles.push(new Particle());
-
-function drawLines() {
-  for (let i = 0; i < particles.length; i++) {
-    for (let j = i + 1; j < particles.length; j++) {
-      const dx = particles[i].x - particles[j].x;
-      const dy = particles[i].y - particles[j].y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 120) {
-        ctx.beginPath();
-        ctx.moveTo(particles[i].x, particles[i].y);
-        ctx.lineTo(particles[j].x, particles[j].y);
-        ctx.strokeStyle = `rgba(0, 240, 255, ${0.08 * (1 - dist / 120)})`;
-        ctx.lineWidth = 0.5;
-        ctx.stroke();
-      }
-    }
-  }
-}
-
-function animateParticles() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => { p.update(); p.draw(); });
-  drawLines();
-  requestAnimationFrame(animateParticles);
-}
+for(let i=0;i<120;i++) particles.push(new Particle());
+function drawLines() { for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++){const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy); if(dist<120){ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.strokeStyle=`rgba(0,240,255,${0.08*(1-dist/120)})`; ctx.lineWidth=0.5; ctx.stroke()}} }
+function animateParticles() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw()}); drawLines(); requestAnimationFrame(animateParticles) }
 animateParticles();
+document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY});
 
-document.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-});
-
-// ========== 标签切换 ==========
 function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
   document.getElementById(`tab-${tab}`).classList.add('active');
   document.getElementById(`tab-${tab}-btn`).classList.add('active');
-  // Update nav active
-  document.querySelectorAll('nav a').forEach((a, i) => {
-    a.classList.toggle('active', (tab === 'calculator' && i === 0) || (tab === 'guide' && i === 1));
-  });
+  document.querySelectorAll('nav a').forEach((a,i)=>a.classList.toggle('active',(tab==='calculator'&&i===0)||(tab==='basics'&&i===1)||(tab==='guide'&&i===2)));
 }
 
-// ========== 核心计算 ==========
-function calcBMR(gender, weight, height, age) {
-  if (gender === 'male') return 88.36 + 13.4 * weight + 4.8 * height - 5.7 * age;
-  return 447.6 + 9.25 * weight + 3.1 * height - 4.33 * age;
+function onSchemeChange() {
+  const v = document.getElementById('cycle-scheme').value;
+  document.getElementById('custom-sliders').style.display = v === 'custom' ? 'block' : 'none';
+  if(v==='custom') updateCycleTotal();
 }
+function updateCycleTotal() {
+  const l = parseInt(document.getElementById('low-days').value);
+  const h = parseInt(document.getElementById('high-days').value);
+  document.getElementById('cycle-total').textContent = l + h;
+}
+
+function calcBMR(gender, weight, height, age) {
+  return gender==='male' ? 88.36+13.4*weight+4.8*height-5.7*age : 447.6+9.25*weight+3.1*height-4.33*age;
+}
+
+const trainingHigh = [
+  '深蹲 4×6-8 | 硬拉 4×6-8 | 卧推 4×8-10 | 引体向上 3×8',
+  '杠铃推举 4×8 | 划船 4×10 | 罗马尼亚硬拉 4×10 | 双杠臂屈伸 3×10',
+  '高翻 4×6 | 深蹲 4×8 | 上斜卧推 4×8 | 引体向上 3×8',
+  '保加利亚分腿蹲 4×8/侧 | 划船 4×10 | 杠铃推举 4×8 | 农夫行走 3×30s',
+  '爆发力训练: 跳箱 4×8 | 药球抛 4×10 | 深蹲 3×8 | 俯卧撑 3×15'
+];
+const trainingLow = [
+  '哑铃弓步蹲 3×12 | 俯卧撑 3×15 | 哑铃推举 3×12 | 平板支撑 3×45s',
+  '自重深蹲 3×15 | 弹力带划船 3×15 | 侧平举 3×15 | 臀桥 3×15',
+  'HIIT: 波比跳30s×8轮 | 壶铃摆荡 4×15 | 战绳 30s×8',
+  '瑜伽/普拉提 30min | 核心训练 3组 | 拉伸 15min',
+  'LISS 有氧 40min（快走/慢跑/椭圆机）'
+];
+const mealsHigh = [
+  '早餐:燕麦80g+蛋3个+香蕉 / 午餐:米饭200g+鸡胸200g+西兰花 / 加餐:全麦面包+花生酱 / 晚餐:米饭150g+牛肉150g+蔬菜',
+  '早餐:全麦三明治+蛋+牛油果 / 午餐:米饭+鱼+蔬菜 / 训前:香蕉 / 训后:米饭+鸡胸 / 晚餐:红薯+牛肉+西兰花',
+  '早餐:燕麦+蛋白粉+蓝莓 / 午餐:土豆+鸡腿+蔬菜 / 加餐:水果+坚果 / 晚餐:米饭+虾+蔬菜'
+];
+const mealsLow = [
+  '早餐:蛋3个+蔬菜+牛油果 / 午餐:鸡胸200g+大量绿叶菜+橄榄油 / 加餐:坚果一小把 / 晚餐:鱼200g+蔬菜沙拉',
+  '早餐:蛋白奶昔+菠菜 / 午餐:牛肉150g+沙拉+牛油果 / 加餐:鸡蛋2个 / 晚餐:豆腐+菌菇+蔬菜',
+  '早餐:蛋2个+蔬菜 / 午餐:鸡腿去皮+绿叶菜 / 加餐:奶酪+黄瓜 / 晚餐:鱼+西蓝花+少量坚果'
+];
 
 function generatePlan() {
   const gender = document.getElementById('gender').value;
@@ -589,114 +550,153 @@ function generatePlan() {
   const goal = document.getElementById('goal').value;
   const scheme = document.getElementById('cycle-scheme').value;
 
-  // Validation
   if (!height || !weight || !age) {
-    document.getElementById('plan-output').innerHTML = `
-      <div class="card" style="border-color:var(--orange)">
-        <div class="card-title"><span style="color:var(--orange)">⚠️</span> 请填写完整的身体参数</div>
-        <p style="color:var(--text-dim)">身高、体重、年龄均为必填项。</p>
-      </div>`;
+    document.getElementById('plan-output').innerHTML = `<div class="card" style="border-color:var(--orange)"><div class="card-title"><span style="color:var(--orange)">⚠️</span> 请填写完整的身体参数</div><p style="color:var(--text-dim)">身高、体重、年龄均为必填项。</p></div>`;
     document.getElementById('plan-output').classList.add('show');
     return;
   }
 
   const bmr = calcBMR(gender, weight, height, age);
   const tdee = bmr * activity;
-
-  // Calorie target
-  let calTarget;
-  let goalLabel;
+  let calTarget, goalLabel;
   if (goal === 'cut') { calTarget = tdee - 400; goalLabel = '🔥 减脂'; }
   else if (goal === 'bulk') { calTarget = tdee + 250; goalLabel = '💪 增肌'; }
   else { calTarget = tdee; goalLabel = '⚖️ 保持'; }
 
-  // Protein
-  const proteinGPerKg = goal === 'cut' ? 2.0 : 1.8;
-  const proteinG = Math.round(weight * proteinGPerKg);
+  const proteinG = Math.round(weight * (goal === 'cut' ? 2.0 : 1.8));
   const proteinCal = proteinG * 4;
-
-  // Fat baseline
   const fatG = Math.round(weight * 0.9);
   const fatCal = fatG * 9;
-
-  // Carbs vary by day
-  const highCarbsG = Math.round((calTarget - proteinCal - fatCal) / 4 * 1.3);
-  const midCarbsG = Math.round((calTarget - proteinCal - fatCal) / 4);
-  const lowCarbsG = Math.round((calTarget - proteinCal - fatCal) / 4 * 0.5);
+  const leftoverForCarbs = calTarget - proteinCal - fatCal;
+  const highCarbsG = Math.round(leftoverForCarbs / 4 * 1.3);
+  const midCarbsG = Math.round(leftoverForCarbs / 4);
+  const lowCarbsG = Math.max(Math.round(leftoverForCarbs / 4 * 0.5), 30);
   const zeroCarbsG = Math.round(weight * 0.3);
 
-  // Generate days
   let days = [];
 
-  if (scheme === 'basic') {
+  if (scheme === 'custom') {
+    const lowN = parseInt(document.getElementById('low-days').value);
+    const highN = parseInt(document.getElementById('high-days').value);
+    const total = lowN + highN;
+    // 生成循环: 先高碳(x highN)再低碳(x lowN)——混合排列更均匀
+    let seq = [];
+    // 均等分布: 间隔插入
+    for (let i = 0; i < total; i++) {
+      if ((i * highN) % total < highN && seq.filter(s=>s==='h').length < highN) {
+        seq.push('h');
+      } else if (seq.filter(s=>s==='l').length < lowN) {
+        seq.push('l');
+      } else {
+        seq.push('l');
+      }
+    }
+    // 修正：如果 seq 数量不对，简单回退
+    while (seq.filter(s=>s==='h').length < highN) seq.push('h');
+    while (seq.filter(s=>s==='l').length < lowN) seq.push('l');
+    seq = seq.slice(0, total);
+    // 重新均匀排列
+    seq = [];
+    const ratio = total / highN;
+    for (let i = 0; i < total; i++) {
+      if (Math.round((i % 1) + (1/ratio) * (highN-1)) < highN % total + 1) {
+        // simpler approach: interleave
+      }
+    }
+    // Simple clean approach: fill in alternating pattern
+    seq = [];
+    const hPositions = new Set();
+    if (highN >= lowN) {
+      const step = total / highN;
+      for (let i = 0; i < highN; i++) {
+        hPositions.add(Math.round(i * step));
+      }
+    } else {
+      const step = total / lowN;
+      for (let i = 0; i < lowN; i++) {
+        hPositions.delete(Math.round(i * step));
+      }
+      for (let i = 0; i < total; i++) hPositions.add(i);
+      for (let i = 0; i < lowN; i++) hPositions.delete(Math.round(i * step));
+    }
+    for (let i = 0; i < total; i++) {
+      seq.push(hPositions.has(i) ? 'h' : 'l');
+    }
+    // If count mismatch, fix
+    const currentHigh = seq.filter(s=>s==='h').length;
+    for (let i = 0; i < total && currentHigh !== highN; i++) {
+      if (currentHigh > highN && seq[i] === 'h') seq[i] = 'l';
+      else if (currentHigh < highN && seq[i] === 'l') { seq[i] = 'h'; break; }
+    }
+
+    let hi = 0, li = 0;
+    seq.forEach((s, idx) => {
+      if (s === 'h') {
+        const t = trainingHigh[hi % trainingHigh.length];
+        const m = mealsHigh[hi % mealsHigh.length];
+        days.push({
+          type: 'high', name: `Day ${idx+1} · 🟢 高碳日（训练日）`,
+          carbs: highCarbsG, cal: Math.round(highCarbsG*4+proteinCal+fatCal),
+          training: t, cardio: '15-20min 低强度有氧', meals: m
+        });
+        hi++;
+      } else {
+        const t = trainingLow[li % trainingLow.length];
+        const m = mealsLow[li % mealsLow.length];
+        days.push({
+          type: 'low', name: `Day ${idx+1} · 🔴 低碳日（休息/轻训）`,
+          carbs: lowCarbsG, cal: Math.round(lowCarbsG*4+proteinCal+fatCal),
+          training: t, cardio: '30-40min LISS 有氧', meals: m
+        });
+        li++;
+      }
+    });
+  } else if (scheme === 'basic') {
     days = [
-      { type: 'high', name: '💪 训练日（高碳）', carbs: highCarbsG, cal: Math.round(highCarbsG * 4 + proteinCal + fatCal), training: '深蹲 4×8 | 硬拉 4×6 | 卧推 4×10 | 引体向上 3×8', cardio: '15-20min 低强度', meals: '燕麦+鸡蛋+香蕉 / 米饭+鸡胸+西兰花 / 训后:米饭+牛肉' },
-      { type: 'low', name: '😴 休息日（低碳）', carbs: lowCarbsG, cal: Math.round(lowCarbsG * 4 + proteinCal + fatCal), training: '休息 或 散步30min', cardio: '散步 30-40min', meals: '鸡蛋+牛油果+蔬菜 / 鸡胸+大量绿叶菜 / 鱼+蔬菜沙拉' },
+      { type:'high', name:'💪 训练日（高碳）', carbs:highCarbsG, cal:Math.round(highCarbsG*4+proteinCal+fatCal), training:'深蹲 4×8 | 硬拉 4×6 | 卧推 4×10 | 引体向上 3×8', cardio:'15-20min 低强度', meals:'燕麦+鸡蛋+香蕉 / 米饭+鸡胸+西兰花 / 训后:米饭+牛肉' },
+      { type:'low', name:'😴 休息日（低碳）', carbs:lowCarbsG, cal:Math.round(lowCarbsG*4+proteinCal+fatCal), training:'休息 或 散步30min', cardio:'散步 30-40min', meals:'鸡蛋+牛油果+蔬菜 / 鸡胸+大量绿叶菜 / 鱼+蔬菜沙拉' },
     ];
   } else if (scheme === 'hlhl') {
     days = [
-      { type: 'high', name: 'Day 1 · 🟢 高碳日', carbs: highCarbsG, cal: Math.round(highCarbsG * 4 + proteinCal + fatCal), training: '深蹲 4×6-8 | 硬拉 4×6-8 | 卧推 4×8-10', cardio: '15min 低强度', meals: '燕麦80g+蛋3个+香蕉 / 米饭200g+鸡胸200g / 训后:米饭150g+牛肉150g' },
-      { type: 'low', name: 'Day 2 · 🔴 低碳日', carbs: lowCarbsG, cal: Math.round(lowCarbsG * 4 + proteinCal + fatCal), training: '哑铃弓步蹲 3×12 | 俯卧撑 3×15 | 哑铃推举 3×12', cardio: 'LISS 30min', meals: '蛋3个+蔬菜+牛油果 / 鸡胸200g+大量绿叶菜 / 鱼200g+蔬菜沙拉' },
-      { type: 'low', name: 'Day 3 · 🔴 低碳日', carbs: lowCarbsG, cal: Math.round(lowCarbsG * 4 + proteinCal + fatCal), training: 'HIIT: 波比跳30s×8轮 | 壶铃摆荡 4×15 | 战绳 30s×8', cardio: 'HIIT 20min', meals: '蛋3个+蔬菜 / 牛肉150g+沙拉 / 蛋白粉+坚果' },
-      { type: 'high', name: 'Day 4 · 🟢 高碳日', carbs: highCarbsG, cal: Math.round(highCarbsG * 4 + proteinCal + fatCal), training: '爆发力训练: 高翻 4×6 | 跳箱 4×8 | 推举 4×8', cardio: '15min 低强度', meals: '燕麦+蛋+香蕉 / 米饭+牛肉+西兰花 / 红薯+鱼+蔬菜' },
+      { type:'high', name:'Day 1 · 🟢 高碳日', carbs:highCarbsG, cal:Math.round(highCarbsG*4+proteinCal+fatCal), training:'深蹲 4×6-8 | 硬拉 4×6-8 | 卧推 4×8-10', cardio:'15min 低强度', meals:'燕麦80g+蛋3个+香蕉 / 米饭200g+鸡胸200g / 训后:米饭150g+牛肉150g' },
+      { type:'low', name:'Day 2 · 🔴 低碳日', carbs:lowCarbsG, cal:Math.round(lowCarbsG*4+proteinCal+fatCal), training:'哑铃弓步蹲 3×12 | 俯卧撑 3×15 | 哑铃推举 3×12', cardio:'LISS 30min', meals:'蛋3个+蔬菜+牛油果 / 鸡胸200g+大量绿叶菜 / 鱼200g+蔬菜沙拉' },
+      { type:'low', name:'Day 3 · 🔴 低碳日', carbs:lowCarbsG, cal:Math.round(lowCarbsG*4+proteinCal+fatCal), training:'HIIT: 波比跳30s×8轮 | 壶铃摆荡 4×15 | 战绳 30s×8', cardio:'HIIT 20min', meals:'蛋3个+蔬菜 / 牛肉150g+沙拉 / 蛋白粉+坚果' },
+      { type:'high', name:'Day 4 · 🟢 高碳日', carbs:highCarbsG, cal:Math.round(highCarbsG*4+proteinCal+fatCal), training:'爆发力训练: 高翻 4×6 | 跳箱 4×8 | 推举 4×8', cardio:'15min 低强度', meals:'燕麦+蛋+香蕉 / 米饭+牛肉+西兰花 / 红薯+鱼+蔬菜' },
     ];
   } else {
-    // 3plus1
     days = [
-      { type: 'high', name: 'Day 1 · 🟢 高碳日', carbs: highCarbsG, cal: Math.round(highCarbsG * 4 + proteinCal + fatCal), training: '深蹲 4×6-8 | 硬拉 4×6-8 | 卧推 4×8 | 划船 3×10', cardio: '20min 低强度', meals: '燕麦80g+蛋3个+香蕉 / 米饭200g+鸡胸200g+西兰花 / 训后:米饭150g+牛肉150g' },
-      { type: 'mid', name: 'Day 2 · 🟡 中碳日', carbs: midCarbsG, cal: Math.round(midCarbsG * 4 + proteinCal + fatCal), training: '上斜卧推 3×10 | 坐姿划船 3×12 | 侧平举 3×15 | 二头弯举 3×12', cardio: '20-30min 中等强度', meals: '全麦面包+蛋+牛油果 / 糙米150g+鸡胸+蔬菜 / 鱼肉+蔬菜' },
-      { type: 'low', name: 'Day 3 · 🔴 低碳日', carbs: lowCarbsG, cal: Math.round(lowCarbsG * 4 + proteinCal + fatCal), training: '哑铃弓步蹲 3×12 | 俯卧撑 3×15 | 平板支撑 3×45s | 农夫行走 3×30s', cardio: 'LISS 30-40min', meals: '蛋3个+蔬菜+牛油果 / 鸡胸200g+大量绿叶菜 / 鱼200g+蔬菜沙拉' },
-      { type: 'zero', name: 'Day 4 · ⚫ 无碳日', carbs: zeroCarbsG, cal: Math.round(zeroCarbsG * 4 + proteinCal + fatCal), training: '主动恢复: 散步 30-60min | 瑜伽/拉伸 20min | 泡沫轴放松', cardio: '散步/拉伸 30min', meals: '蛋3个+蔬菜 / 鸡胸+大量绿叶菜+橄榄油 / 鱼肉+蔬菜沙拉+坚果' },
+      { type:'high', name:'Day 1 · 🟢 高碳日', carbs:highCarbsG, cal:Math.round(highCarbsG*4+proteinCal+fatCal), training:'深蹲 4×6-8 | 硬拉 4×6-8 | 卧推 4×8 | 划船 3×10', cardio:'20min 低强度', meals:'燕麦80g+蛋3个+香蕉 / 米饭200g+鸡胸200g+西兰花 / 训后:米饭150g+牛肉150g' },
+      { type:'mid', name:'Day 2 · 🟡 中碳日', carbs:midCarbsG, cal:Math.round(midCarbsG*4+proteinCal+fatCal), training:'上斜卧推 3×10 | 坐姿划船 3×12 | 侧平举 3×15 | 二头弯举 3×12', cardio:'20-30min 中等强度', meals:'全麦面包+蛋+牛油果 / 糙米150g+鸡胸+蔬菜 / 鱼肉+蔬菜' },
+      { type:'low', name:'Day 3 · 🔴 低碳日', carbs:lowCarbsG, cal:Math.round(lowCarbsG*4+proteinCal+fatCal), training:'哑铃弓步蹲 3×12 | 俯卧撑 3×15 | 平板支撑 3×45s | 农夫行走 3×30s', cardio:'LISS 30-40min', meals:'蛋3个+蔬菜+牛油果 / 鸡胸200g+大量绿叶菜 / 鱼200g+蔬菜沙拉' },
+      { type:'zero', name:'Day 4 · ⚫ 无碳日', carbs:zeroCarbsG, cal:Math.round(zeroCarbsG*4+proteinCal+fatCal), training:'主动恢复: 散步 30-60min | 瑜伽/拉伸 20min | 泡沫轴放松', cardio:'散步/拉伸 30min', meals:'蛋3个+蔬菜 / 鸡胸+大量绿叶菜+橄榄油 / 鱼肉+蔬菜沙拉+坚果' },
     ];
   }
 
-  // Render
   const output = document.getElementById('plan-output');
+  const schemeLabel = scheme === 'custom' ? `自定义 ${document.getElementById('low-days').value}低+${document.getElementById('high-days').value}高循环` : scheme === 'basic' ? '基础循环' : scheme === 'hlhl' ? '高-低-低-高' : '经典3+1循环';
   output.innerHTML = `
     <div class="card" style="animation:fadeIn 0.5s ease">
       <div class="card-title">
         <span class="icon">📋</span>
         <span class="accent">你的专属训练计划</span>
-        <span style="color:var(--text-dim);font-size:0.8rem;font-weight:400;margin-left:auto">${goalLabel} · ${scheme === 'basic' ? '基础循环' : scheme === 'hlhl' ? '高-低-低-高' : '经典3+1循环'}</span>
+        <span style="color:var(--text-dim);font-size:0.8rem;font-weight:400;margin-left:auto">${goalLabel} · ${schemeLabel}</span>
       </div>
       <div class="plan-header">
-        <div class="plan-stat">
-          <div class="value">${Math.round(bmr)}</div>
-          <div class="label">基础代谢 BMR (kcal)</div>
-        </div>
-        <div class="plan-stat">
-          <div class="value">${Math.round(tdee)}</div>
-          <div class="label">日总消耗 TDEE (kcal)</div>
-        </div>
-        <div class="plan-stat">
-          <div class="value">${Math.round(calTarget)}</div>
-          <div class="label">目标摄入 (kcal/日)</div>
-        </div>
-        <div class="plan-stat">
-          <div class="value">${proteinG}g</div>
-          <div class="label">每日蛋白质目标</div>
-        </div>
-        <div class="plan-stat">
-          <div class="value">${fatG}g</div>
-          <div class="label">每日脂肪基准</div>
-        </div>
+        <div class="plan-stat"><div class="value">${Math.round(bmr)}</div><div class="label">基础代谢 BMR (kcal)</div></div>
+        <div class="plan-stat"><div class="value">${Math.round(tdee)}</div><div class="label">日总消耗 TDEE (kcal)</div></div>
+        <div class="plan-stat"><div class="value">${Math.round(calTarget)}</div><div class="label">目标摄入 (kcal/日)</div></div>
+        <div class="plan-stat"><div class="value">${proteinG}g</div><div class="label">每日蛋白质目标</div></div>
+        <div class="plan-stat"><div class="value">${fatG}g</div><div class="label">每日脂肪基准</div></div>
       </div>
       <p style="color:var(--text-dim);margin-bottom:1rem;text-align:center">
-        ⚡ <strong style="color:var(--text)">${weight}kg · ${height}cm · ${age}岁 · ${gender === 'male' ? '男性' : '女性'}</strong>
+        ⚡ <strong style="color:var(--text)">${weight}kg · ${height}cm · ${age}岁 · ${gender==='male'?'男性':'女性'}</strong>
         &nbsp;|&nbsp; 蛋白质 <strong style="color:var(--cyan)">${proteinG}g/日</strong> &nbsp;|&nbsp; 脂肪 <strong style="color:var(--gold)">${fatG}g/日</strong>
       </p>
-      ${days.map((d, i) => {
-        let typeClass = d.type === 'high' ? 'day-high' : d.type === 'mid' ? 'day-mid' : d.type === 'low' ? 'day-low' : d.type === 'zero' ? 'day-zero' : 'day-rest';
-        return `<div class="day-card ${typeClass}">
-          <div class="day-head">
-            <span class="day-name">${d.name}</span>
-            <span class="day-type">${d.carbs}g 碳水 · ${d.cal}kcal</span>
-          </div>
-          <div class="day-detail">
-            <strong>🏋️ 训练：</strong>${d.training}<br>
-            <strong>🏃 有氧：</strong>${d.cardio}<br>
-            <strong>🍽️ 饮食建议：</strong>${d.meals}
-          </div>
+      ${days.map((d,i)=>{
+        const tc = d.type==='high'?'day-high':d.type==='mid'?'day-mid':d.type==='low'?'day-low':d.type==='zero'?'day-zero':'day-rest';
+        return `<div class="day-card ${tc}">
+          <div class="day-head"><span class="day-name">${d.name}</span><span class="day-type">${d.carbs}g 碳水 · ${d.cal}kcal</span></div>
+          <div class="day-detail"><strong>🏋️ 训练：</strong>${d.training}<br><strong>🏃 有氧：</strong>${d.cardio}<br><strong>🍽️ 饮食建议：</strong>${d.meals}</div>
         </div>`;
       }).join('')}
       <div style="margin-top:1.5rem;padding:1rem;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid var(--border)">
@@ -705,27 +705,40 @@ function generatePlan() {
           每个循环结束后重复。建议执行 4-6 周后重新计算调整。
           喝水 ≥2.5L/天 · 睡眠 ≥7h · 每周测围度和体重。
         </p>
+        <p style="color:var(--text-dim);font-size:0.85rem;margin-top:0.4rem">
+          🌱 新手看这里 → <a style="color:var(--cyan);cursor:pointer;text-decoration:underline" onclick="switchTab('basics')">点击查看「新手入门」</a>，了解外卖米饭有多少碳水、怎么看配料表
+        </p>
       </div>
-    </div>
-  `;
+    </div>`;
   output.classList.add('show');
 }
 
 function resetForm() {
-  document.getElementById('gender').value = 'male';
-  document.getElementById('height').value = '175';
-  document.getElementById('weight').value = '75';
-  document.getElementById('age').value = '28';
-  document.getElementById('activity').value = '1.375';
-  document.getElementById('goal').value = 'cut';
-  document.getElementById('cycle-scheme').value = '3plus1';
+  document.getElementById('gender').value='male';
+  document.getElementById('height').value='175';
+  document.getElementById('weight').value='75';
+  document.getElementById('age').value='28';
+  document.getElementById('activity').value='1.375';
+  document.getElementById('goal').value='cut';
+  document.getElementById('cycle-scheme').value='custom';
+  document.getElementById('low-days').value='2';
+  document.getElementById('high-days').value='2';
+  document.getElementById('low-days-val').textContent='2';
+  document.getElementById('high-days-val').textContent='2';
+  document.getElementById('cycle-total').textContent='4';
+  document.getElementById('custom-sliders').style.display='block';
   document.getElementById('plan-output').classList.remove('show');
 }
 
-// Auto-generate on load
-window.onload = function() {
-  generatePlan();
-};
+// 初始化
+onSchemeChange();
+updateCycleTotal();
+window.onload = function() { generatePlan(); };
+
+// 滑块联动更新总天数
+['low-days','high-days'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateCycleTotal);
+});
 </script>
 </body>
 </html>
