@@ -726,12 +726,36 @@ function generatePlan() {
       </p>
       ${days.map((d,i)=>{
         const tc = d.type==='high'?'day-high':d.type==='mid'?'day-mid':d.type==='low'?'day-low':d.type==='zero'?'day-zero':'day-rest';
-        return `<div class="day-card ${tc}">
-          <div class="day-head"><span class="day-name">${d.name}</span><span class="day-type">${d.carbs}g 碳水 · ${d.cal}kcal</span></div>
-          <div class="day-detail"><strong>🏋️ 训练：</strong>${d.training}<br><strong>🏃 有氧：</strong>${d.cardio}<br><strong>🍽️ 饮食建议：</strong>${d.meals}</div>
+        return `<div class="day-card ${tc}" data-idx="${i}">
+          <div class="day-head">
+            <span class="day-name">${d.name}</span>
+            <span class="day-type">${d.carbs}g 碳水 · ${d.cal}kcal</span>
+            <button class="edit-toggle-btn" onclick="toggleEdit(${i})" style="margin-left:auto;background:rgba(0,240,255,0.1);border:1px solid var(--border);border-radius:6px;color:var(--cyan);padding:0.3rem 0.7rem;font-size:0.75rem;cursor:pointer;font-family:var(--font)">✏️ 编辑</button>
+          </div>
+          <div class="day-detail view-mode" id="view-${i}">
+            <strong>🏋️ 训练：</strong><span class="field-val" id="val-training-${i}">${d.training}</span><br>
+            <strong>🏃 有氧：</strong><span class="field-val" id="val-cardio-${i}">${d.cardio}</span><br>
+            <strong>🍽️ 饮食建议：</strong><span class="field-val" id="val-meals-${i}">${d.meals}</span>
+          </div>
+          <div class="day-detail edit-mode" id="edit-${i}" style="display:none">
+            <label style="font-size:0.8rem;color:var(--cyan);display:block;margin-bottom:0.2rem">🏋️ 训练内容：</label>
+            <textarea id="edit-training-${i}" style="width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:0.5rem;font-size:0.85rem;font-family:var(--font);margin-bottom:0.5rem;resize:vertical" rows="2">${d.training}</textarea>
+            <label style="font-size:0.8rem;color:var(--cyan);display:block;margin-bottom:0.2rem">🏃 有氧安排：</label>
+            <textarea id="edit-cardio-${i}" style="width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:0.5rem;font-size:0.85rem;font-family:var(--font);margin-bottom:0.5rem;resize:vertical" rows="1">${d.cardio}</textarea>
+            <label style="font-size:0.8rem;color:var(--cyan);display:block;margin-bottom:0.2rem">🍽️ 饮食建议：</label>
+            <textarea id="edit-meals-${i}" style="width:100%;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:0.5rem;font-size:0.85rem;font-family:var(--font);margin-bottom:0.5rem;resize:vertical" rows="2">${d.meals}</textarea>
+            <button onclick="saveEdit(${i})" style="background:linear-gradient(135deg,var(--cyan),#0099cc);border:none;border-radius:6px;color:#000;padding:0.4rem 1.2rem;font-size:0.8rem;cursor:pointer;font-weight:600;font-family:var(--font)">✓ 保存修改</button>
+            <button onclick="cancelEdit(${i})" style="background:transparent;border:1px solid var(--text-dim);border-radius:6px;color:var(--text-dim);padding:0.4rem 1.2rem;font-size:0.8rem;cursor:pointer;margin-left:0.5rem;font-family:var(--font)">✕ 取消</button>
+          </div>
         </div>`;
       }).join('')}
-      <div style="margin-top:1.5rem;padding:1rem;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid var(--border)">
+      <div style="margin-top:1.5rem;display:flex;gap:0.8rem;flex-wrap:wrap">
+        <button class="btn" onclick="exportPlan('txt')" style="font-size:0.85rem;padding:0.6rem 1.2rem">📥 导出为 TXT</button>
+        <button class="btn btn-outline" onclick="exportPlan('md')" style="font-size:0.85rem;padding:0.6rem 1.2rem">📥 导出为 Markdown</button>
+        <button class="btn btn-outline" onclick="copyPlanText()" style="font-size:0.85rem;padding:0.6rem 1.2rem">📋 复制全文</button>
+        <span id="copy-feedback" style="color:var(--green);font-size:0.8rem;align-self:center;display:none">✓ 已复制到剪贴板</span>
+      </div>
+      <div style="margin-top:1.2rem;padding:1rem;background:rgba(0,0,0,0.3);border-radius:8px;border:1px solid var(--border)">
         <p style="color:var(--text-dim);font-size:0.85rem">
           💡 <strong style="color:var(--cyan);">小贴士：</strong>
           每个循环结束后重复。建议执行 4-6 周后重新计算调整。
@@ -771,6 +795,127 @@ window.onload = function() { generatePlan(); };
 ['low-days','high-days'].forEach(id => {
   document.getElementById(id).addEventListener('input', updateCycleTotal);
 });
+
+// 编辑功能
+function toggleEdit(i) {
+  const view = document.getElementById('view-'+i);
+  const edit = document.getElementById('edit-'+i);
+  const isEditing = edit.style.display !== 'none';
+  view.style.display = isEditing ? 'block' : 'none';
+  edit.style.display = isEditing ? 'none' : 'block';
+}
+function saveEdit(i) {
+  const training = document.getElementById('edit-training-'+i).value;
+  const cardio = document.getElementById('edit-cardio-'+i).value;
+  const meals = document.getElementById('edit-meals-'+i).value;
+  document.getElementById('val-training-'+i).textContent = training;
+  document.getElementById('val-cardio-'+i).textContent = cardio;
+  document.getElementById('val-meals-'+i).textContent = meals;
+  toggleEdit(i);
+}
+function cancelEdit(i) {
+  // Restore from the view (displayed) values
+  const origTraining = document.getElementById('val-training-'+i).textContent;
+  const origCardio = document.getElementById('val-cardio-'+i).textContent;
+  const origMeals = document.getElementById('val-meals-'+i).textContent;
+  document.getElementById('edit-training-'+i).value = origTraining;
+  document.getElementById('edit-cardio-'+i).value = origCardio;
+  document.getElementById('edit-meals-'+i).value = origMeals;
+  toggleEdit(i);
+}
+function getCurrentPlanText(format) {
+  const bmr = document.querySelector('.plan-stat:nth-child(1) .value')?.textContent || '—';
+  const tdee = document.querySelector('.plan-stat:nth-child(2) .value')?.textContent || '—';
+  const calTarget = document.querySelector('.plan-stat:nth-child(3) .value')?.textContent || '—';
+  const proteinG = document.querySelector('.plan-stat:nth-child(4) .value')?.textContent || '—';
+  const fatG = document.querySelector('.plan-stat:nth-child(5) .value')?.textContent || '—';
+  const infoEl = document.querySelector('#plan-output p[style*="text-align:center"]');
+  const infoText = infoEl ? infoEl.textContent.replace(/\s+/g,' ').trim() : '';
+  const schemeLabel = document.querySelector('.card-title span[style*="margin-left:auto"]')?.textContent || '';
+
+  let lines = [];
+  lines.push('═══════════════════════════════════════');
+  lines.push('  碳循环训练计划 · Carb Cycle Pro');
+  lines.push('═══════════════════════════════════════');
+  lines.push('');
+  lines.push('📊 身体参数：' + infoText);
+  lines.push('📋 ' + schemeLabel);
+  lines.push('');
+  lines.push('┌─ 代谢数据 ─────────────────────────┐');
+  lines.push('│  BMR 基础代谢： ' + bmr + ' kcal');
+  lines.push('│  TDEE 总消耗： ' + tdee + ' kcal');
+  lines.push('│  目标摄入：    ' + calTarget + ' kcal/日');
+  lines.push('│  蛋白质目标：  ' + proteinG + ' g/日');
+  lines.push('│  脂肪基准：    ' + fatG + ' g/日');
+  lines.push('└────────────────────────────────────┘');
+  lines.push('');
+
+  const dayCards = document.querySelectorAll('.day-card');
+  dayCards.forEach((card, idx) => {
+    const nameEl = card.querySelector('.day-name');
+    const typeEl = card.querySelector('.day-type');
+    const trainingEl = card.querySelector('[id^="val-training-"]');
+    const cardioEl = card.querySelector('[id^="val-cardio-"]');
+    const mealsEl = card.querySelector('[id^="val-meals-"]');
+    const name = nameEl ? nameEl.textContent : 'Day '+(idx+1);
+    const ctype = typeEl ? typeEl.textContent : '';
+    const training = trainingEl ? trainingEl.textContent : '';
+    const cardio = cardioEl ? cardioEl.textContent : '';
+    const meals = mealsEl ? mealsEl.textContent : '';
+    lines.push('── ' + name + ' ──');
+    lines.push('  碳水·热量：' + ctype);
+    lines.push('  🏋️ 训练：' + training);
+    lines.push('  🏃 有氧：' + cardio);
+    lines.push('  🍽️ 饮食：' + meals);
+    lines.push('');
+  });
+
+  lines.push('──────────────────────────────────────');
+  lines.push('  工具：https://yan827919-pixel.github.io/carb-cycle-trainer/');
+  lines.push('  喝水 ≥2.5L/天 · 睡眠 ≥7h · 每周称重');
+  lines.push('  坚持 4-6 周后重新调整计划');
+  lines.push('──────────────────────────────────────');
+
+  const text = lines.join('\n');
+  if (format === 'md') {
+    return text.replace(/│/g,'|').replace(/[─┌┐└┘]/g,'-').replace(/├┤/g,'|')
+      .replace(/═══════/g,'---').replace(/──/g,'**').replace(/──/g,'**')
+      + '\n\n📍 完整指南：https://yan827919-pixel.github.io/carb-cycle-trainer/';
+  }
+  return text;
+}
+// 导出功能
+function exportPlan(format) {
+  const ext = format === 'md' ? 'md' : 'txt';
+  const content = getCurrentPlanText(format);
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const now = new Date();
+  const dateStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  a.download = '碳循环训练计划_'+dateStr+'.'+ext;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function copyPlanText() {
+  const text = getCurrentPlanText('txt');
+  navigator.clipboard.writeText(text).then(() => {
+    const fb = document.getElementById('copy-feedback');
+    fb.style.display = 'inline';
+    setTimeout(() => fb.style.display = 'none', 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.left='-9999px';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    const fb = document.getElementById('copy-feedback');
+    fb.style.display = 'inline';
+    setTimeout(() => fb.style.display = 'none', 2000);
+  });
+}
 
 // 赞助弹窗
 function showSponsor() { document.getElementById('sponsor-modal').classList.add('show') }
